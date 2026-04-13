@@ -8,10 +8,15 @@
     "start": "node server.js",
     "dev": "node --watch server.js"
   },
-  "keywords": ["healthcare", "microservice", "patient"],
+  "keywords": [
+    "healthcare",
+    "microservice",
+    "patient"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^1.15.0",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^1.41.3",
     "dotenv": "^16.4.7",
