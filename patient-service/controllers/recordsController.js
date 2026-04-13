@@ -1,38 +1,48 @@
+import axios from "axios";
+
+const APPOINTMENT_SERVICE_URL = process.env.APPOINTMENT_SERVICE_URL;
+
 /**
- * @desc    Get medical history (mock / placeholder)
+ * @desc    Get patient appointment history via Appointment Service
  * @route   GET /api/patients/history
  */
-export const getHistory = async (_req, res, _next) => {
-  const mockHistory = [
-    {
-      id: 1,
-      date: "2025-01-15",
-      diagnosis: "Seasonal Flu",
-      doctor: "Dr. Smith",
-      notes: "Prescribed rest and fluids. Follow-up in 1 week.",
-    },
-    {
-      id: 2,
-      date: "2025-03-22",
-      diagnosis: "Sprained Ankle",
-      doctor: "Dr. Patel",
-      notes: "X-ray clear. Ice and elevation recommended.",
-    },
-    {
-      id: 3,
-      date: "2025-06-10",
-      diagnosis: "Routine Checkup",
-      doctor: "Dr. Kim",
-      notes: "All vitals normal. Next checkup in 6 months.",
-    },
-  ];
+export const getHistory = async (req, res, _next) => {
+  try {
+    const patientId = req.patient._id;
+    const authHeader = req.headers.authorization;
 
-  res.status(200).json({
-    success: true,
-    message: "Mock medical history. Will be replaced by inter-service calls.",
-    count: mockHistory.length,
-    history: mockHistory,
-  });
+    if (!APPOINTMENT_SERVICE_URL) {
+      console.error("[PatientService] APPOINTMENT_SERVICE_URL is not configured.");
+      return res.status(500).json({
+        success: false,
+        message: "Appointment Service URL is not configured.",
+      });
+    }
+
+    const response = await axios.get(
+      `${APPOINTMENT_SERVICE_URL}/api/appointments/patient/${patientId}`,
+      {
+        headers: {
+          Authorization: authHeader,
+        },
+      }
+    );
+
+    return res.status(response.status).json(response.data);
+  } catch (error) {
+    const status = error.response?.status || 500;
+    const errorData = error.response?.data || {};
+
+    console.error(
+      `[PatientService] Failed to fetch history from Appointment Service: ${error.message}`,
+      { status, patientId: req.patient?._id }
+    );
+
+    return res.status(status).json({
+      success: false,
+      message: errorData.message || "Failed to retrieve appointment history.",
+    });
+  }
 };
 
 /**
