@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: payment-config
+  namespace: healthcare
+data:
+  NODE_ENV: "production"
+  PAYMENT_PROVIDER: "mock"
+  LOG_LEVEL: "info"
