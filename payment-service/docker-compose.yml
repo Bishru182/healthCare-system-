@@ -1,0 +1,62 @@
+version: '3.9'
+
+services:
+  # ── Payment Service ────────────────────────────────────────────────────────
+  payment-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: payment-service
+    restart: unless-stopped
+    ports:
+      - '3003:3003'
+    environment:
+      PORT: 3003
+      MONGO_URI: ${MONGO_URI:-mongodb+srv://root:bishru@books-store-mern.kq25k3n.mongodb.net/medico?appName=Books-Store-MERN}
+      JWT_SECRET: ${JWT_SECRET:-your_jwt_secret_here}
+      PAYMENT_PROVIDER: ${PAYMENT_PROVIDER:-mock}
+      CLOUD_NAME: ${CLOUD_NAME:-dus7bhnd3}
+      CLOUD_API_KEY: ${CLOUD_API_KEY}
+      CLOUD_API_SECRET: ${CLOUD_API_SECRET}
+      NOTIFICATION_SERVICE_URL: ${NOTIFICATION_SERVICE_URL:-http://notification-service:3004}
+      APPOINTMENT_SERVICE_URL: ${APPOINTMENT_SERVICE_URL:-http://appointment-service:3002}
+      NODE_ENV: ${NODE_ENV:-development}
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - healthcare-net
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3003/health']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  # ── MongoDB ────────────────────────────────────────────────────────────────
+  mongo:
+    image: mongo:7.0
+    container_name: payment-mongo
+    restart: unless-stopped
+    ports:
+      - '27019:27017'       # mapped to 27019 to avoid conflict with other services
+    volumes:
+      - payment_mongo_data:/data/db
+    networks:
+      - healthcare-net
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+# ── Volumes ────────────────────────────────────────────────────────────────────
+volumes:
+  payment_mongo_data:
+
+# ── Networks ───────────────────────────────────────────────────────────────────
+networks:
+  healthcare-net:
+    external: true        # shared network across all healthcare microservices
+    name: healthcare-net

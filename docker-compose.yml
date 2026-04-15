@@ -1,0 +1,100 @@
+version: '3.9'
+
+services:
+  # ── Patient Service ────────────────────────────────────────────────────────
+  patient-service:
+    build:
+      context: ./patient-service
+      dockerfile: Dockerfile
+    container_name: patient-service
+    restart: unless-stopped
+    ports:
+      - '3001:3001'
+    environment:
+      PORT: 3001
+      NODE_ENV: development
+    networks:
+      - healthcare-net
+    depends_on:
+      - appointment-service
+      - payment-service
+
+  # ── Appointment Service ────────────────────────────────────────────────────
+  appointment-service:
+    build:
+      context: ./appointment-service
+      dockerfile: Dockerfile
+    container_name: appointment-service
+    restart: unless-stopped
+    ports:
+      - '3002:3002'
+    environment:
+      PORT: 3002
+      NODE_ENV: development
+    networks:
+      - healthcare-net
+    depends_on:
+      - mongo-appointment
+
+  # ── Payment Service ────────────────────────────────────────────────────────
+  payment-service:
+    build:
+      context: ./payment-service
+      dockerfile: Dockerfile
+    container_name: payment-service
+    restart: unless-stopped
+    ports:
+      - '3003:3003'
+    environment:
+      PORT: 3003
+      NODE_ENV: development
+      MONGO_URI: mongodb://mongo-payment:27017/payment
+      APPOINTMENT_SERVICE_URL: http://appointment-service:3002
+      PATIENT_SERVICE_URL: http://patient-service:3001
+    networks:
+      - healthcare-net
+    depends_on:
+      mongo-payment:
+        condition: service_healthy
+
+  # ── MongoDB for Appointment Service ────────────────────────────────────────
+  mongo-appointment:
+    image: mongo:7.0
+    container_name: mongo-appointment
+    restart: unless-stopped
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo_appointment_data:/data/db
+    networks:
+      - healthcare-net
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── MongoDB for Payment Service ────────────────────────────────────────────
+  mongo-payment:
+    image: mongo:7.0
+    container_name: mongo-payment
+    restart: unless-stopped
+    ports:
+      - '27018:27017'
+    volumes:
+      - mongo_payment_data:/data/db
+    networks:
+      - healthcare-net
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  healthcare-net:
+    driver: bridge
+
+volumes:
+  mongo_appointment_data:
+  mongo_payment_data:
