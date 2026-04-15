@@ -1,10 +1,10 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: healthcare
+namespace: default
 
 resources:
-  - namespace.yaml
+  
   - payment-serviceaccount.yaml
   - payment-configmap.yaml
   - payment-secret.yaml
