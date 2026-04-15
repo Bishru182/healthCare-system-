@@ -2,7 +2,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: payment-service-hpa
-  namespace: healthcare
+  namespace: default
 spec:
   scaleTargetRef:
     apiVersion: apps/v1

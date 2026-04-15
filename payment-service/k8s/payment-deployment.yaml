@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: payment-service
-  namespace: healthcare
+  namespace: default
   labels:
     app: payment-service
     version: v1
@@ -25,7 +25,7 @@ spec:
       serviceAccountName: payment-service
       containers:
       - name: payment-service
-        image: payment-service:latest
+        image: payment-service-payment-service:latest
         imagePullPolicy: IfNotPresent
         ports:
         - name: http
