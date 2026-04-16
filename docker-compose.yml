@@ -200,6 +200,10 @@ services:
       MONGO_URI: mongodb://mongo-notification:27017/notification
       EMAIL_USER: ${EMAIL_USER:-}
       EMAIL_PASS: ${EMAIL_PASS:-}
+      TEXTLK_API_TOKEN: ${TEXTLK_API_TOKEN:-}
+      TEXTLK_SENDER_ID: ${TEXTLK_SENDER_ID:-TextLKDemo}
+      TEXTLK_SMS_API_URL: ${TEXTLK_SMS_API_URL:-https://app.text.lk/api/v3/sms/send}
+      TEXTLK_SMS_TYPE: ${TEXTLK_SMS_TYPE:-plain}
       TWILIO_SID: ${TWILIO_SID:-}
       TWILIO_AUTH: ${TWILIO_AUTH:-}
       TWILIO_PHONE: ${TWILIO_PHONE:-}
