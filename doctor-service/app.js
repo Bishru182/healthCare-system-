@@ -6,9 +6,24 @@ import errorHandler from "./middleware/errorHandler.js";
 
 const app = express();
 
+const defaultAllowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:4173",
+  "http://localhost:30173",
+  "http://127.0.0.1:5173",
+  "http://127.0.0.1:30173",
+];
+
+const allowedOrigins = (process.env.CORS_ORIGINS
+  ? process.env.CORS_ORIGINS.split(",")
+  : defaultAllowedOrigins
+)
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:4173"],
+    origin: allowedOrigins,
     credentials: true,
   })
 );

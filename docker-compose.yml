@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   # ── Patient Service ────────────────────────────────────────────────────────
   patient-service:
@@ -13,10 +11,14 @@ services:
     environment:
       PORT: 3001
       NODE_ENV: development
+      CORS_ORIGINS: http://localhost:5173,http://localhost:4173,http://localhost:30173,http://127.0.0.1:5173,http://127.0.0.1:30173
       JWT_SECRET: medico-shared-jwt-secret-change-in-prod
       MONGO_URI: mongodb://mongo-patient:27017/patient
       APPOINTMENT_SERVICE_URL: http://appointment-service:3002
       DOCTOR_SERVICE_URL: http://doctor-service:3004
+      CLOUD_NAME: ${CLOUD_NAME:-dus7bhnd3}
+      CLOUD_API_KEY: ${CLOUD_API_KEY:-551137298448198}
+      CLOUD_API_SECRET: ${CLOUD_API_SECRET:-naoKz3ikK05AvrclUHOi3kBM5zw}
       INTER_SERVICE_API_KEY: ${INTER_SERVICE_API_KEY:-medico-internal-key-change-me}
     networks:
       - healthcare-net
@@ -37,6 +39,7 @@ services:
     environment:
       PORT: 3002
       NODE_ENV: development
+      CORS_ORIGINS: http://localhost:5173,http://localhost:4173,http://localhost:30173,http://127.0.0.1:5173,http://127.0.0.1:30173
       JWT_SECRET: medico-shared-jwt-secret-change-in-prod
       MONGO_URI: mongodb://mongo-appointment:27017/appointment
       PATIENT_SERVICE_URL: http://patient-service:3001
@@ -62,6 +65,7 @@ services:
     environment:
       PORT: 3003
       NODE_ENV: development
+      CORS_ORIGINS: http://localhost:5173,http://localhost:4173,http://localhost:30173,http://127.0.0.1:5173,http://127.0.0.1:30173
       JWT_SECRET: medico-shared-jwt-secret-change-in-prod
       MONGO_URI: mongodb://mongo-payment:27017/payment
       APPOINTMENT_SERVICE_URL: http://appointment-service:3002
@@ -84,6 +88,7 @@ services:
     environment:
       PORT: 3004
       NODE_ENV: development
+      CORS_ORIGINS: http://localhost:5173,http://localhost:4173,http://localhost:30173,http://127.0.0.1:5173,http://127.0.0.1:30173
       JWT_SECRET: medico-shared-jwt-secret-change-in-prod
       MONGO_URI: mongodb://mongo-doctor:27017/doctor
       APPOINTMENT_SERVICE_URL: http://appointment-service:3002
@@ -106,6 +111,7 @@ services:
     environment:
       PORT: 3005
       NODE_ENV: development
+      CORS_ORIGINS: http://localhost:5173,http://localhost:4173,http://localhost:30173,http://127.0.0.1:5173,http://127.0.0.1:30173
       JWT_SECRET: medico-shared-jwt-secret-change-in-prod
       MONGO_URI: mongodb://mongo-telemedicine:27017/telemedicine
       APPOINTMENT_SERVICE_URL: http://appointment-service:3002
@@ -117,6 +123,31 @@ services:
     depends_on:
       - mongo-telemedicine
       - appointment-service
+
+  # ── Frontend ───────────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_PATIENT_API: /api/patients
+        VITE_APPOINTMENT_API: /api/appointments
+        VITE_PAYMENT_API: /api/payments
+        VITE_DOCTOR_API: /api/doctors
+        VITE_TELEMEDICINE_API: /api/telemedicine
+        VITE_NOTIFICATION_API: /api/notifications
+    container_name: frontend
+    restart: unless-stopped
+    ports:
+      - '5173:80'
+    depends_on:
+      - patient-service
+      - appointment-service
+      - payment-service
+      - doctor-service
+      - telemedicine-service
+    networks:
+      - healthcare-net
 
   # ── MongoDB: Patient ───────────────────────────────────────────────────────
   mongo-patient:
