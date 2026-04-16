@@ -88,19 +88,11 @@ export default function LoginPage() {
             ))}
           </div>
 
-<<<<<<< HEAD
-          {selectedRole === 'admin' ? (
+          {selectedRole === 'doctor' ? (
             <div className="placeholder-notice">
               <span className="placeholder-icon">🚧</span>
-              <p><strong>Admin Portal</strong> is coming soon.</p>
-              <p>Currently Patient and Doctor login are available.</p>
-=======
-          {selectedRole !== 'patient' && selectedRole !== 'admin' ? (
-            <div className="placeholder-notice">
-              <span className="placeholder-icon">🚧</span>
-              <p><strong>{selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)} Portal</strong> is coming soon.</p>
-              <p>Currently only Patient and Admin logins are available.</p>
->>>>>>> affath-new
+              <p><strong>Doctor Portal</strong> is coming soon.</p>
+              <p>Currently Patient and Admin login are available.</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="auth-form">
