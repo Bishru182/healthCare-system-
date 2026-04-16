@@ -10,6 +10,8 @@ import { HTTP_STATUS, PAYMENT_METHOD } from '../config/constants.js';
 export const validate = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    console.error('[Validation Error] Request body:', req.body);
+    console.error('[Validation Error] Details:', errors.array());
     return res.status(HTTP_STATUS.BAD_REQUEST).json({
       success: false,
       message: 'Validation failed',

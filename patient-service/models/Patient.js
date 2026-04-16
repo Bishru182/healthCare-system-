@@ -29,6 +29,11 @@ const patientSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    role: {
+      type: String,
+      enum: ['patient', 'admin'],
+      default: 'patient',
+    },
   },
   { timestamps: true }
 );

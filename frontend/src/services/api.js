@@ -28,12 +28,12 @@ const attachToken = (instance) => {
   return instance
 }
 
-// Base URLs – override per environment. Default to direct localhost ports (docker-compose).
-const PATIENT_BASE       = import.meta.env.VITE_PATIENT_API       || 'http://localhost:3001/api/patients'
-const APPOINTMENT_BASE   = import.meta.env.VITE_APPOINTMENT_API   || 'http://localhost:3002/api/appointments'
-const PAYMENT_BASE       = import.meta.env.VITE_PAYMENT_API       || 'http://localhost:3003/api/payments'
-const DOCTOR_BASE        = import.meta.env.VITE_DOCTOR_API        || 'http://localhost:3004/api/doctors'
-const TELEMEDICINE_BASE  = import.meta.env.VITE_TELEMEDICINE_API  || 'http://localhost:3005/api/telemedicine'
+// Base URLs – corrected port mappings
+const PATIENT_BASE       = 'http://localhost:3002/api/patients'
+const APPOINTMENT_BASE   = 'http://localhost:3001/api/appointments'
+const PAYMENT_BASE       = 'http://localhost:3003/api/payments'
+const DOCTOR_BASE        = 'http://localhost:3004/api/doctors'
+const TELEMEDICINE_BASE  = 'http://localhost:3005/api/telemedicine'
 
 export const patientApi = attachToken(axios.create({ baseURL: PATIENT_BASE }))
 export const appointmentApi = attachToken(axios.create({ baseURL: APPOINTMENT_BASE }))

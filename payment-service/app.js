@@ -7,6 +7,7 @@
 // ─────────────────────────────────────────────
 
 import express from 'express';
+import cors from 'cors';
 import 'dotenv/config';
 
 // ── Middleware ────────────────────────────────
@@ -21,6 +22,9 @@ const app = express();
 // ─────────────────────────────────────────────
 // 1. Core Middleware
 // ─────────────────────────────────────────────
+
+// CORS configuration
+app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
 
 // Parse incoming JSON bodies
 app.use(express.json({ limit: '10kb' }));

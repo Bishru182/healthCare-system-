@@ -5,7 +5,7 @@ import { useToast } from '../context/ToastContext'
 import ConfirmModal from '../components/ConfirmModal'
 import './DashboardLayout.css'
 
-const patientNav = [
+const patientNavItems = [
   { to: '/patient/dashboard',     label: 'Dashboard',       icon: '⚡' },
   { to: '/patient/profile',       label: 'My Profile',      icon: '👤' },
   { to: '/patient/reports',       label: 'Medical Reports', icon: '📋' },
@@ -14,6 +14,12 @@ const patientNav = [
   { to: '/patient/consultations', label: 'Video Consults',  icon: '🎥' },
   { to: '/patient/history',       label: 'History',         icon: '🕐' },
   { to: '/patient/prescriptions', label: 'Prescriptions',   icon: '💊' },
+  { to: '/patient/payments',      label: 'Payments',        icon: '💳' },
+]
+
+const adminNavItems = [
+  { to: '/admin/notifications',   label: 'Notification Logs', icon: '🔔' },
+  { to: '/admin/payments',        label: 'Payment Management', icon: '💳' },
 ]
 
 const doctorNav = [
@@ -25,10 +31,6 @@ const doctorNav = [
   { to: '/doctor/prescriptions', label: 'Prescriptions', icon: '💊' },
 ]
 
-const adminNav = [
-  { to: '/admin/notifications',  label: 'Notification Logs', icon: '🔔' },
-]
-
 export default function DashboardLayout() {
   const { user, role, logout } = useAuth()
   const toast = useToast()
@@ -36,7 +38,8 @@ export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [showLogoutModal, setShowLogoutModal] = useState(false)
 
-  const navItems = role === 'doctor' ? doctorNav : role === 'admin' ? adminNav : patientNav
+  // Select nav items based on user role
+  const navItems = role === 'doctor' ? doctorNav : role === 'admin' ? adminNavItems : patientNavItems
   const roleLabel = role === 'doctor' ? 'Doctor' : role === 'admin' ? 'Admin' : 'Patient'
   const displayName = role === 'doctor'
     ? `Dr. ${user?.name || ''}`
