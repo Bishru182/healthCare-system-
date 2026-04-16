@@ -1,35 +1,4 @@
-import axios from 'axios'
-
-// Create isolated axios instance for payment service
-const attachToken = (instance) => {
-  instance.interceptors.request.use(
-    (config) => {
-      const token = localStorage.getItem('medico_token')
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`
-      }
-      return config
-    },
-    (error) => Promise.reject(error)
-  )
-  instance.interceptors.response.use(
-    (res) => res,
-    (error) => {
-      if (error.response?.status === 401) {
-        localStorage.removeItem('medico_token')
-        localStorage.removeItem('medico_user')
-        localStorage.removeItem('medico_role')
-        window.location.href = '/login'
-      }
-      return Promise.reject(error)
-    }
-  )
-  return instance
-}
-
-const paymentApi = attachToken(
-  axios.create({ baseURL: 'http://localhost:3003/api/payments' })
-)
+import { paymentApi } from './api'
 
 export const paymentService = {
   /**

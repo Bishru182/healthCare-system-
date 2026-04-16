@@ -24,6 +24,8 @@ spec:
               value: "3002"
             - name: NODE_ENV
               value: production
+            - name: CORS_ORIGINS
+              value: http://localhost:30173,http://localhost:5173,http://localhost:4173,http://127.0.0.1:5173,http://127.0.0.1:30173
             - name: MONGO_URI
               value: mongodb://mongo:27017/appointment
             - name: JWT_SECRET
@@ -83,6 +85,8 @@ spec:
               value: "3001"
             - name: NODE_ENV
               value: production
+            - name: CORS_ORIGINS
+              value: http://localhost:30173,http://localhost:5173,http://localhost:4173,http://127.0.0.1:5173,http://127.0.0.1:30173
             - name: MONGO_URI
               value: mongodb://mongo:27017/patient
             - name: JWT_SECRET
@@ -161,6 +165,8 @@ spec:
               value: "3003"
             - name: NODE_ENV
               value: production
+            - name: CORS_ORIGINS
+              value: http://localhost:30173,http://localhost:5173,http://localhost:4173,http://127.0.0.1:5173,http://127.0.0.1:30173
             - name: MONGO_URI
               value: mongodb://mongo:27017/payment
             - name: JWT_SECRET
@@ -226,6 +232,8 @@ spec:
               value: "3004"
             - name: NODE_ENV
               value: production
+            - name: CORS_ORIGINS
+              value: http://localhost:30173,http://localhost:5173,http://localhost:4173,http://127.0.0.1:5173,http://127.0.0.1:30173
             - name: MONGO_URI
               value: mongodb://mongo:27017/doctor
             - name: JWT_SECRET
@@ -287,6 +295,8 @@ spec:
               value: "3005"
             - name: NODE_ENV
               value: production
+            - name: CORS_ORIGINS
+              value: http://localhost:30173,http://localhost:5173,http://localhost:4173,http://127.0.0.1:5173,http://127.0.0.1:30173
             - name: MONGO_URI
               value: mongodb://mongo:27017/telemedicine
             - name: JWT_SECRET

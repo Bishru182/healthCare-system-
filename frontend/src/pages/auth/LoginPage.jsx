@@ -24,21 +24,27 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (selectedRole === 'doctor') {
-      toast.info('Doctor portal is coming soon.')
-      return
-    }
     setLoading(true)
     try {
-      const { data } = await authService.login({ email, password })
-      // Use the role from the response
-      const userRole = data.patient.role || selectedRole
-      login(data.patient, userRole, data.token)
-      toast.success(`Welcome back, ${data.patient.name}!`)
+      const { data } =
+        selectedRole === 'doctor'
+          ? await doctorAuthService.login({ email, password })
+          : await authService.login({ email, password })
+
+      const userData = selectedRole === 'doctor' ? data.doctor : data.patient
+      if (!userData) {
+        throw new Error('Invalid login response.')
+      }
+
+      const userRole = userData.role || selectedRole
+      login(userData, userRole, data.token)
+      toast.success(`Welcome back, ${userData.name}!`)
       
       // Navigate based on role
       if (userRole === 'admin') {
         navigate('/admin/payments')
+      } else if (userRole === 'doctor') {
+        navigate('/doctor/dashboard')
       } else {
         navigate('/patient/dashboard')
       }
@@ -88,47 +94,39 @@ export default function LoginPage() {
             ))}
           </div>
 
-          {selectedRole === 'doctor' ? (
-            <div className="placeholder-notice">
-              <span className="placeholder-icon">🚧</span>
-              <p><strong>Doctor Portal</strong> is coming soon.</p>
-              <p>Currently Patient and Admin login are available.</p>
+          <form onSubmit={handleSubmit} className="auth-form">
+            <div className="form-group">
+              <label htmlFor="login-email" className="form-label">Email Address</label>
+              <input
+                id="login-email"
+                type="email"
+                className="form-input"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+              />
             </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="auth-form">
-              <div className="form-group">
-                <label htmlFor="login-email" className="form-label">Email Address</label>
-                <input
-                  id="login-email"
-                  type="email"
-                  className="form-input"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  autoComplete="email"
-                />
-              </div>
 
-              <div className="form-group">
-                <label htmlFor="login-password" className="form-label">Password</label>
-                <input
-                  id="login-password"
-                  type="password"
-                  className="form-input"
-                  placeholder="Your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  autoComplete="current-password"
-                />
-              </div>
+            <div className="form-group">
+              <label htmlFor="login-password" className="form-label">Password</label>
+              <input
+                id="login-password"
+                type="password"
+                className="form-input"
+                placeholder="Your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoComplete="current-password"
+              />
+            </div>
 
-              <button type="submit" className="btn btn-primary btn-full btn-lg" disabled={loading}>
-                {loading ? <Spinner size="sm" /> : `Sign In as ${selectedRole === 'patient' ? 'Patient' : 'Doctor'}`}
-              </button>
-            </form>
-          )}
+            <button type="submit" className="btn btn-primary btn-full btn-lg" disabled={loading}>
+              {loading ? <Spinner size="sm" /> : `Sign In as ${selectedRole === 'patient' ? 'Patient' : selectedRole === 'doctor' ? 'Doctor' : 'Admin'}`}
+            </button>
+          </form>
 
           <p className="auth-switch">
             Don't have an account? <Link to="/signup">Create one</Link>

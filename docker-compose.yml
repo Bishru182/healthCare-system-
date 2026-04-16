@@ -11,6 +11,7 @@ services:
     environment:
       PORT: 3001
       NODE_ENV: development
+      CORS_ORIGINS: http://localhost:5173,http://localhost:4173,http://localhost:30173,http://127.0.0.1:5173,http://127.0.0.1:30173
       JWT_SECRET: medico-shared-jwt-secret-change-in-prod
       MONGO_URI: mongodb://mongo-patient:27017/patient
       APPOINTMENT_SERVICE_URL: http://appointment-service:3002
@@ -37,6 +38,7 @@ services:
     environment:
       PORT: 3002
       NODE_ENV: development
+      CORS_ORIGINS: http://localhost:5173,http://localhost:4173,http://localhost:30173,http://127.0.0.1:5173,http://127.0.0.1:30173
       JWT_SECRET: medico-shared-jwt-secret-change-in-prod
       MONGO_URI: mongodb://mongo-appointment:27017/appointment
     networks:
@@ -56,6 +58,7 @@ services:
     environment:
       PORT: 3003
       NODE_ENV: development
+      CORS_ORIGINS: http://localhost:5173,http://localhost:4173,http://localhost:30173,http://127.0.0.1:5173,http://127.0.0.1:30173
       JWT_SECRET: medico-shared-jwt-secret-change-in-prod
       MONGO_URI: mongodb://mongo-payment:27017/payment
       APPOINTMENT_SERVICE_URL: http://appointment-service:3002
@@ -78,6 +81,7 @@ services:
     environment:
       PORT: 3004
       NODE_ENV: development
+      CORS_ORIGINS: http://localhost:5173,http://localhost:4173,http://localhost:30173,http://127.0.0.1:5173,http://127.0.0.1:30173
       JWT_SECRET: medico-shared-jwt-secret-change-in-prod
       MONGO_URI: mongodb://mongo-doctor:27017/doctor
       APPOINTMENT_SERVICE_URL: http://appointment-service:3002
@@ -99,6 +103,7 @@ services:
     environment:
       PORT: 3005
       NODE_ENV: development
+      CORS_ORIGINS: http://localhost:5173,http://localhost:4173,http://localhost:30173,http://127.0.0.1:5173,http://127.0.0.1:30173
       JWT_SECRET: medico-shared-jwt-secret-change-in-prod
       MONGO_URI: mongodb://mongo-telemedicine:27017/telemedicine
       APPOINTMENT_SERVICE_URL: http://appointment-service:3002
@@ -122,6 +127,7 @@ services:
         VITE_PAYMENT_API: /api/payments
         VITE_DOCTOR_API: /api/doctors
         VITE_TELEMEDICINE_API: /api/telemedicine
+        VITE_NOTIFICATION_API: /api/notifications
     container_name: frontend
     restart: unless-stopped
     ports:

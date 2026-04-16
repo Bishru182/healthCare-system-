@@ -65,6 +65,11 @@ $deployments = @(
   'frontend'
 )
 
+Write-Host 'Restarting deployments to pick up latest :local images...' -ForegroundColor Cyan
+foreach ($d in $deployments) {
+  kubectl rollout restart deployment/$d -n $Namespace | Out-Null
+}
+
 foreach ($d in $deployments) {
   Write-Host "Waiting for deployment/$d..." -ForegroundColor Cyan
   kubectl rollout status deployment/$d -n $Namespace --timeout=300s

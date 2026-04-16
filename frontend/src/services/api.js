@@ -1,5 +1,10 @@
 import axios from 'axios'
 
+const normalizeApiBase = (value, fallback) => {
+  const selected = (value || fallback).trim()
+  return selected.endsWith('/') ? selected.slice(0, -1) : selected
+}
+
 // ── Intercept every request and attach JWT ──
 const attachToken = (instance) => {
   instance.interceptors.request.use(
@@ -28,12 +33,11 @@ const attachToken = (instance) => {
   return instance
 }
 
-// Base URLs – corrected port mappings
-const PATIENT_BASE       = 'http://localhost:3002/api/patients'
-const APPOINTMENT_BASE   = 'http://localhost:3001/api/appointments'
-const PAYMENT_BASE       = 'http://localhost:3003/api/payments'
-const DOCTOR_BASE        = 'http://localhost:3004/api/doctors'
-const TELEMEDICINE_BASE  = 'http://localhost:3005/api/telemedicine'
+const PATIENT_BASE = normalizeApiBase(import.meta.env.VITE_PATIENT_API, '/api/patients')
+const APPOINTMENT_BASE = normalizeApiBase(import.meta.env.VITE_APPOINTMENT_API, '/api/appointments')
+const PAYMENT_BASE = normalizeApiBase(import.meta.env.VITE_PAYMENT_API, '/api/payments')
+const DOCTOR_BASE = normalizeApiBase(import.meta.env.VITE_DOCTOR_API, '/api/doctors')
+const TELEMEDICINE_BASE = normalizeApiBase(import.meta.env.VITE_TELEMEDICINE_API, '/api/telemedicine')
 
 export const patientApi = attachToken(axios.create({ baseURL: PATIENT_BASE }))
 export const appointmentApi = attachToken(axios.create({ baseURL: APPOINTMENT_BASE }))

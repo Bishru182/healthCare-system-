@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5005/api/notifications/logs';
+const API_URL = import.meta.env.VITE_NOTIFICATION_API || '/api/notifications/logs';
 
 // ─── Badge colour helpers ─────────────────────
 const statusClasses = {
