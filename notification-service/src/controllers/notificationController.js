@@ -7,7 +7,7 @@
 
 import NotificationLog from '../models/NotificationLog.js';
 import sendEmail       from '../config/mailer.js';
-import sendSMS         from '../config/twilio.js';
+import sendSMS, { sendWhatsApp } from '../config/twilio.js';
 import getTemplate     from '../services/templateService.js';
 
 // ─────────────────────────────────────────────
@@ -84,6 +84,28 @@ export const sendNotification = async (req, res) => {
           eventType,
           recipient: recipient.phone,
           channel: 'sms',
+          status: 'failed',
+          errorMessage: error.message,
+        });
+      }
+    }
+
+    // ── WhatsApp channel ───────────────────────────────────────────
+    if (channels.includes('whatsapp') && recipient.phone) {
+      try {
+        await sendWhatsApp(recipient.phone, message);
+        await NotificationLog.create({
+          eventType,
+          recipient: recipient.phone,
+          channel: 'whatsapp',
+          status: 'sent',
+        });
+      } catch (error) {
+        console.error(`❌  WhatsApp failed for ${recipient.phone}:`, error.message);
+        await NotificationLog.create({
+          eventType,
+          recipient: recipient.phone,
+          channel: 'whatsapp',
           status: 'failed',
           errorMessage: error.message,
         });

@@ -234,6 +234,7 @@ services:
       TWILIO_SID: ${TWILIO_SID:-}
       TWILIO_AUTH: ${TWILIO_AUTH:-}
       TWILIO_PHONE: ${TWILIO_PHONE:-}
+      TWILIO_WHATSAPP_FROM: ${TWILIO_WHATSAPP_FROM:-}
     networks:
       - healthcare-net
     depends_on:

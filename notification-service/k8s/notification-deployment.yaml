@@ -69,6 +69,11 @@ spec:
             secretKeyRef:
               name: notification-secrets
               key: TWILIO_PHONE
+        - name: TWILIO_WHATSAPP_FROM
+          valueFrom:
+            secretKeyRef:
+              name: notification-secrets
+              key: TWILIO_WHATSAPP_FROM
         resources:
           requests:
             cpu: 100m
