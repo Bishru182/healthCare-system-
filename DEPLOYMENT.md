@@ -1,71 +1,116 @@
-# Healthcare System Deployment
+# Healthcare System Deployment Runbook
 
-## Docker deployment
+This file gives copy-paste commands to run the full project in Docker and Kubernetes.
 
-1. Open PowerShell in the repository root.
-2. Run:
+## 1) Prerequisites
 
-```powershell
-./scripts/deploy-docker.ps1
-```
+Run these checks first in PowerShell from project root.
 
-This builds all services and starts the full stack using `docker-compose.yml`.
+	docker desktop status
+	docker version
+	kubectl version --client
 
-Expected endpoints:
+Expected:
+
+- Docker status should be `running`
+- `docker version` should show both Client and Server versions
+- kubectl client version should print successfully
+
+If Docker is not running, start it:
+
+	docker desktop start
+
+## 2) Docker Deployment (Full Stack)
+
+Run:
+
+	powershell -ExecutionPolicy Bypass -File .\scripts\deploy-docker.ps1
+
+What this does:
+
+- Builds all containers from [docker-compose.yml](docker-compose.yml)
+- Starts services in background
+- Validates key HTTP endpoints
+
+Expected endpoints after success:
 
 - Frontend: http://localhost:5173
-- Patient: http://localhost:3001
-- Appointment: http://localhost:3002
-- Payment: http://localhost:3003/health
-- Doctor: http://localhost:3004
-- Telemedicine: http://localhost:3005
+- Patient Service: http://localhost:3001
+- Appointment Service: http://localhost:3002
+- Payment Service: http://localhost:3003/health
+- Doctor Service: http://localhost:3004
+- Telemedicine Service: http://localhost:3005
+- Notification Service: http://localhost:5005
 
-To stop Docker stack:
+Stop Docker stack:
 
-```powershell
-docker compose down
-```
+	docker compose down
 
-## Kubernetes deployment
+Rebuild fresh:
 
-1. Ensure a Kubernetes context exists and is active:
+	docker compose down
+	docker compose up -d --build
 
-```powershell
-kubectl config current-context
-```
+## 3) Kubernetes Deployment (Full Stack)
 
-If you do not have a local cluster yet, create one with Kind:
+### 3.1 Ensure kube context exists
 
-```powershell
-./scripts/create-kind-cluster.ps1
-```
+	kubectl config current-context
 
-2. Deploy:
+If no context is set, create a local kind cluster:
 
-```powershell
-./scripts/deploy-k8s.ps1
-```
+	powershell -ExecutionPolicy Bypass -File .\scripts\create-kind-cluster.ps1
 
-What this script does:
+### 3.2 Deploy
 
-- Builds all service images including frontend.
-- Loads images into kind automatically if context is kind-*.
-- Applies manifests from `k8s/` using kustomize.
-- Waits for all deployments to become ready.
+	powershell -ExecutionPolicy Bypass -File .\scripts\deploy-k8s.ps1
+
+What this does:
+
+- Builds all local images
+- Loads images into kind automatically when context starts with `kind-`
+- Applies manifests from [k8s/kustomization.yaml](k8s/kustomization.yaml)
+- Waits for all deployments to become ready
+
+Check resources:
+
+	kubectl get pods -n healthcare
+	kubectl get svc -n healthcare
 
 Frontend access:
 
 - NodePort: http://localhost:30173
-- If NodePort is unreachable in your cluster type:
+- If NodePort is unreachable:
 
-```powershell
-kubectl port-forward -n healthcare svc/frontend 5173:80
-```
+	  kubectl port-forward -n healthcare svc/frontend 5173:80
 
-Then open http://localhost:5173
+Then open: http://localhost:5173
 
-Cleanup:
+Cleanup Kubernetes resources:
 
-```powershell
-./scripts/destroy-k8s.ps1
-```
+	powershell -ExecutionPolicy Bypass -File .\scripts\destroy-k8s.ps1
+
+## 4) Fast Troubleshooting
+
+### Docker API 500 / Docker stuck in starting
+
+Symptoms:
+
+- `docker compose up` fails with API 500
+- `docker desktop status` stays `starting`
+
+Do:
+
+1. Close Docker Desktop UI
+2. Re-open Docker Desktop as Administrator
+3. Wait until status becomes `running`
+4. Retry Docker deploy script
+
+### Kubernetes deploy says no active context
+
+Run:
+
+	powershell -ExecutionPolicy Bypass -File .\scripts\create-kind-cluster.ps1
+	kubectl config current-context
+	powershell -ExecutionPolicy Bypass -File .\scripts\deploy-k8s.ps1
+
