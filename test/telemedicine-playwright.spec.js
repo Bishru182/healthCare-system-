@@ -247,12 +247,105 @@ async function createSession(appointmentId) {
   return body.session;
 }
 
+async function seedAuthStorage(page, { role, token, user }) {
+  await page.evaluate(
+    ({ role: nextRole, token: nextToken, user: nextUser }) => {
+      localStorage.setItem("medico_role", nextRole);
+      localStorage.setItem("medico_token", nextToken);
+      localStorage.setItem("medico_user", JSON.stringify(nextUser));
+    },
+    { role, token, user }
+  );
+}
+
 async function configureUserContext(context, { role, token, user }) {
   void role;
   void token;
   void user;
 
   await context.addInitScript(() => {
+    const existingMediaDevices = navigator.mediaDevices || {};
+    const fakeDevices = [
+      { kind: "videoinput", deviceId: "camera-main", label: "Main Camera", groupId: "media-group" },
+      { kind: "videoinput", deviceId: "camera-secondary", label: "Secondary Camera", groupId: "media-group" },
+      { kind: "audioinput", deviceId: "mic-main", label: "Main Microphone", groupId: "media-group" },
+      { kind: "audioinput", deviceId: "mic-backup", label: "Backup Microphone", groupId: "media-group" },
+    ];
+
+    const createFakeMediaStream = async (constraints = {}) => {
+      const wantsVideo = constraints.video !== false;
+      const wantsAudio = constraints.audio !== false;
+      const stream = new MediaStream();
+
+      if (wantsVideo) {
+        const canvas = document.createElement("canvas");
+        canvas.width = 320;
+        canvas.height = 180;
+        const ctx = canvas.getContext("2d");
+        let tick = 0;
+        const intervalId = setInterval(() => {
+          tick += 1;
+          ctx.fillStyle = "#0f172a";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = "#38bdf8";
+          ctx.fillRect((tick * 6) % canvas.width, 0, 26, canvas.height);
+          ctx.fillStyle = "#e2e8f0";
+          ctx.font = "16px sans-serif";
+          ctx.fillText("Fake Camera", 10, 24);
+        }, 66);
+
+        const videoStream = canvas.captureStream(15);
+        for (const track of videoStream.getVideoTracks()) {
+          const originalStop = track.stop.bind(track);
+          track.stop = () => {
+            clearInterval(intervalId);
+            originalStop();
+          };
+          stream.addTrack(track);
+        }
+      }
+
+      if (wantsAudio) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+          const audioContext = new AudioContextClass();
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+          const destination = audioContext.createMediaStreamDestination();
+          oscillator.frequency.value = 220;
+          gainNode.gain.value = 0.04;
+          oscillator.connect(gainNode);
+          gainNode.connect(destination);
+          oscillator.start();
+
+          for (const track of destination.stream.getAudioTracks()) {
+            const originalStop = track.stop.bind(track);
+            track.stop = () => {
+              try { oscillator.stop(); } catch {}
+              try { audioContext.close(); } catch {}
+              originalStop();
+            };
+            stream.addTrack(track);
+          }
+        }
+      }
+
+      return stream;
+    };
+
+    Object.defineProperty(navigator, "mediaDevices", {
+      configurable: true,
+      enumerable: true,
+      value: {
+        ...existingMediaDevices,
+        enumerateDevices: async () => fakeDevices,
+        getUserMedia: async (constraints = { video: true, audio: true }) =>
+          createFakeMediaStream(constraints),
+        addEventListener: () => {},
+        removeEventListener: () => {},
+      },
+    });
+
     if (typeof window.JitsiMeetExternalAPI === "function") return;
 
     window.JitsiMeetExternalAPI = function JitsiMeetExternalAPI(domain, options) {
@@ -447,6 +540,55 @@ test("telemedicine API lifecycle and authorization", async () => {
   ).toBeTruthy();
 });
 
+test("doctor can verify camera and microphone before joining", async ({ browser }) => {
+  const appointmentId = "64b8c4a0f1234567890abc93";
+  const session = await createSession(appointmentId);
+
+  const doctorContext = await browser.newContext();
+  await configureUserContext(doctorContext, {
+    role: "doctor",
+    token: doctorToken,
+    user: { id: DOCTOR_ID, name: "Doctor Playwright" },
+  });
+
+  const doctorPage = await doctorContext.newPage();
+  await doctorPage.goto(`${frontendBaseUrl}/login`);
+  await seedAuthStorage(doctorPage, {
+    role: "doctor",
+    token: doctorToken,
+    user: { id: DOCTOR_ID, name: "Doctor Playwright" },
+  });
+
+  await doctorPage.goto(`${frontendBaseUrl}/doctor/consultations/${session._id}`);
+
+  await expect(doctorPage.getByTestId("camera-select")).toBeVisible();
+  await expect(doctorPage.getByTestId("mic-select")).toBeVisible();
+  await expect(doctorPage.getByTestId("camera-select").locator("option")).toHaveCount(2);
+  await expect(doctorPage.getByTestId("mic-select").locator("option")).toHaveCount(2);
+
+  await doctorPage.getByRole("button", { name: /Check Camera & Mic/i }).click();
+  await expect(doctorPage.getByTestId("media-status")).toContainText(/ready/i);
+
+  await doctorPage.getByRole("button", { name: /Start Mic Test/i }).click();
+  await expect
+    .poll(async () =>
+      doctorPage.getByTestId("volume-meter-fill").evaluate((el) => {
+        const width = Number.parseFloat(el.style.width || "0");
+        return Number.isFinite(width) ? width : 0;
+      })
+    )
+    .toBeGreaterThan(0);
+
+  await doctorPage.getByTestId("camera-select").selectOption("camera-secondary");
+  await doctorPage.getByTestId("mic-select").selectOption("mic-backup");
+  await doctorPage.getByRole("button", { name: /Apply Devices/i }).click();
+
+  await doctorPage.getByRole("button", { name: /Join Call/i }).click();
+  await expect(doctorPage.locator(".fake-jitsi-ready")).toBeVisible();
+
+  await doctorContext.close();
+});
+
 test("doctor and patient open the same video room", async ({ browser }) => {
   const appointmentId = "64b8c4a0f1234567890abc92";
   const session = await createSession(appointmentId);
@@ -474,31 +616,17 @@ test("doctor and patient open the same video room", async ({ browser }) => {
     patientPage.goto(`${frontendBaseUrl}/login`),
   ]);
 
-  await doctorPage.evaluate(
-    ({ role, token, user }) => {
-      localStorage.setItem("medico_role", role);
-      localStorage.setItem("medico_token", token);
-      localStorage.setItem("medico_user", JSON.stringify(user));
-    },
-    {
-      role: "doctor",
-      token: doctorToken,
-      user: { id: DOCTOR_ID, name: "Doctor Playwright" },
-    }
-  );
+  await seedAuthStorage(doctorPage, {
+    role: "doctor",
+    token: doctorToken,
+    user: { id: DOCTOR_ID, name: "Doctor Playwright" },
+  });
 
-  await patientPage.evaluate(
-    ({ role, token, user }) => {
-      localStorage.setItem("medico_role", role);
-      localStorage.setItem("medico_token", token);
-      localStorage.setItem("medico_user", JSON.stringify(user));
-    },
-    {
-      role: "patient",
-      token: patientToken,
-      user: { id: PATIENT_ID, name: "Patient Playwright" },
-    }
-  );
+  await seedAuthStorage(patientPage, {
+    role: "patient",
+    token: patientToken,
+    user: { id: PATIENT_ID, name: "Patient Playwright" },
+  });
 
   await Promise.all([
     doctorPage.goto(`${frontendBaseUrl}/doctor/consultations/${session._id}`),
