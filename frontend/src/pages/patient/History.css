@@ -1,0 +1,30 @@
+/* History Page — Reschedule extras */
+@import './Appointments.css';
+
+
+.reschedule-modal {
+  max-width: 520px;
+  width: 95%;
+}
+
+.reschedule-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Compact time grid inside the modal */
+.time-grid-sm {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.time-grid-sm .time-slot {
+  padding: 7px 4px;
+  font-size: 0.72rem;
+}
+
+@media (max-width: 480px) {
+  .time-grid-sm { grid-template-columns: repeat(3, 1fr); }
+}

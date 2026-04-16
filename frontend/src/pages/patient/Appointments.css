@@ -1,0 +1,200 @@
+/* Appointments Page */
+
+.appt-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 24px;
+  align-items: start;
+}
+
+.appt-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.appt-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.appt-step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 24px;
+}
+
+/* ── Time Slots ── */
+.time-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.time-slot {
+  padding: 8px 6px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+  text-align: center;
+}
+
+.time-slot:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-light);
+}
+
+.time-slot-active {
+  border-color: var(--primary) !important;
+  background: var(--primary) !important;
+  color: white !important;
+  box-shadow: 0 2px 8px rgba(14,165,233,0.3);
+}
+
+/* ── Sidebar ── */
+.appt-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: sticky;
+  top: calc(var(--navbar-height) + 24px);
+}
+
+.doctor-preview {
+  text-align: center;
+  padding: 32px 20px;
+}
+
+.doctor-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: white;
+  font-size: 1.25rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+}
+
+.doctor-name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.doctor-specialty {
+  font-size: 0.8rem;
+  color: var(--primary);
+  font-weight: 600;
+  background: var(--primary-light);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  display: inline-block;
+  margin-bottom: 16px;
+}
+
+.doctor-meta {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+
+.doctor-meta-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.meta-label { font-size: 0.72rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; }
+.meta-value { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); }
+
+.booking-summary {
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  margin-top: 16px;
+  text-align: left;
+  border: 1px solid var(--border);
+}
+
+.booking-summary-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.booking-summary p {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.doctor-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 32px;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  border: 1.5px dashed var(--border);
+  text-align: center;
+}
+
+.doctor-placeholder span { font-size: 3rem; }
+.doctor-placeholder p { font-size: 0.875rem; color: var(--text-muted); }
+
+.mock-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--accent-light);
+  border: 1px solid #c7d2fe;
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  font-size: 0.78rem;
+  color: #4338ca;
+}
+
+.mock-notice span { flex-shrink: 0; }
+
+@media (max-width: 900px) {
+  .appt-layout {
+    grid-template-columns: 1fr;
+  }
+  .appt-sidebar {
+    position: static;
+    order: -1;
+  }
+}
+
+@media (max-width: 480px) {
+  .time-grid { grid-template-columns: repeat(2, 1fr); }
+}

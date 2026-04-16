@@ -1,0 +1,280 @@
+/* Patient Pages — shared styles */
+
+/* ── Page wrapper ── */
+.dashboard-page {
+  max-width: 1100px;
+}
+
+/* ── Page Header ── */
+.page-header {
+  margin-bottom: 28px;
+}
+
+.page-title {
+  font-size: 1.625rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.page-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+/* ── Section title ── */
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 28px 0 14px;
+}
+
+/* ── Dashboard Hero ── */
+.dash-hero {
+  background: linear-gradient(135deg, #0f172a 0%, #0c2a4e 100%);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.dash-hero::before {
+  content: '';
+  position: absolute;
+  right: -40px;
+  top: -40px;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(14,165,233,0.2), transparent 70%);
+}
+
+.dash-greeting {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: white;
+  margin-bottom: 6px;
+}
+
+.dash-subtext {
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+.dash-hero-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: rgba(14,165,233,0.15);
+  border: 1px solid rgba(14,165,233,0.3);
+  border-radius: var(--radius-md);
+  padding: 12px 18px;
+  color: var(--primary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.dash-hero-badge span:first-child { font-size: 1.75rem; }
+
+/* ── Stat Grid ── */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.stat-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  transition: all var(--transition);
+}
+
+.stat-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.stat-label {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* ── Quick Actions ── */
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.quick-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  text-decoration: none;
+  transition: all var(--transition);
+  color: var(--text-primary);
+}
+
+.quick-card:hover {
+  border-color: var(--accent-color, var(--primary));
+  background: color-mix(in srgb, var(--accent-color, var(--primary)) 8%, white);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  text-decoration: none;
+  color: var(--text-primary);
+}
+
+.quick-icon { font-size: 1.5rem; flex-shrink: 0; }
+.quick-label { flex: 1; font-size: 0.875rem; font-weight: 600; }
+.quick-arrow { color: var(--text-muted); font-size: 1rem; transition: transform var(--transition); }
+.quick-card:hover .quick-arrow { transform: translateX(4px); }
+
+/* ── Health Tip ── */
+.health-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+  border: 1px solid #a7f3d0;
+  border-radius: var(--radius-md);
+  padding: 20px;
+  margin-top: 28px;
+}
+
+.tip-icon { font-size: 1.5rem; flex-shrink: 0; }
+.health-tip strong { display: block; color: #065f46; font-size: 0.9rem; margin-bottom: 4px; }
+.health-tip p { color: #047857; font-size: 0.875rem; }
+
+/* ── Card ── */
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.card-body { padding: 24px; }
+
+/* ── Table ── */
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.data-table th {
+  padding: 10px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.data-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+.data-table tbody tr:last-child td { border-bottom: none; }
+.data-table tbody tr:hover { background: var(--bg); }
+
+/* ── Badge / Status ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-pending   { background: var(--warning-light);  color: #92400e; }
+.badge-confirmed { background: var(--primary-light);  color: var(--primary-dark); }
+.badge-completed { background: var(--success-light);  color: #065f46; }
+.badge-cancelled { background: var(--danger-light);   color: #991b1b; }
+
+/* ── Profile Form ── */
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .stat-grid  { grid-template-columns: repeat(2, 1fr); }
+  .quick-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .stat-grid     { grid-template-columns: 1fr 1fr; }
+  .profile-grid  { grid-template-columns: 1fr; }
+  .dash-hero     { flex-direction: column; align-items: flex-start; }
+  .dash-hero-badge { display: none; }
+  .dash-greeting { font-size: 1.375rem; }
+}
+
+@media (max-width: 480px) {
+  .stat-grid  { grid-template-columns: 1fr; }
+  .quick-grid { grid-template-columns: 1fr 1fr; }
+}
