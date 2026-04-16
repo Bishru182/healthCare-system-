@@ -57,6 +57,7 @@ cp .env.example .env
 | `TWILIO_SID`   | —                                    | Twilio Account SID                        |
 | `TWILIO_AUTH`  | —                                    | Twilio Auth Token                         |
 | `TWILIO_PHONE` | —                                    | Twilio phone number (E.164 format)        |
+| `TWILIO_WHATSAPP_FROM` | —                             | Optional WhatsApp sender (`whatsapp:+...`), falls back to `TWILIO_PHONE` |
 
 ---
 
@@ -109,13 +110,13 @@ kubectl get pods -l app=notification-service
 ## 📡 API Endpoints
 
 ### `POST /api/notifications/send`
-Dispatch email and/or SMS notifications. Returns **200 immediately** (fire-and-forget processing).
+Dispatch email, SMS, and/or WhatsApp notifications. Returns **200 immediately** (fire-and-forget processing).
 
 **Request body:**
 ```json
 {
   "eventType": "APPOINTMENT_BOOKED",
-  "channels": ["email", "sms"],
+  "channels": ["email", "sms", "whatsapp"],
   "recipients": [
     {
       "name": "John Doe",
@@ -210,7 +211,7 @@ curl -X POST http://localhost:5005/api/notifications/send \
   -H "Content-Type: application/json" \
   -d '{
     "eventType": "APPOINTMENT_BOOKED",
-    "channels": ["email"],
+    "channels": ["email", "whatsapp"],
     "recipients": [{"name": "Test", "email": "test@example.com", "phone": "+94771234567"}],
     "data": {"doctorName": "Silva", "date": "2026-04-20", "time": "10:00 AM"}
   }'
