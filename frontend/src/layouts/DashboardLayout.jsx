@@ -25,6 +25,10 @@ const doctorNav = [
   { to: '/doctor/prescriptions', label: 'Prescriptions', icon: '💊' },
 ]
 
+const adminNav = [
+  { to: '/admin/notifications',  label: 'Notification Logs', icon: '🔔' },
+]
+
 export default function DashboardLayout() {
   const { user, role, logout } = useAuth()
   const toast = useToast()
@@ -32,11 +36,11 @@ export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [showLogoutModal, setShowLogoutModal] = useState(false)
 
-  const navItems = role === 'doctor' ? doctorNav : patientNav
-  const roleLabel = role === 'doctor' ? 'Doctor' : 'Patient'
+  const navItems = role === 'doctor' ? doctorNav : role === 'admin' ? adminNav : patientNav
+  const roleLabel = role === 'doctor' ? 'Doctor' : role === 'admin' ? 'Admin' : 'Patient'
   const displayName = role === 'doctor'
     ? `Dr. ${user?.name || ''}`
-    : (user?.name || 'Patient')
+    : (user?.name || roleLabel)
 
   const handleLogout = () => {
     logout()

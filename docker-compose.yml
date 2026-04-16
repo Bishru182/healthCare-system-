@@ -185,6 +185,47 @@ services:
     networks:
       - healthcare-net
 
+  # ── Notification Service ────────────────────────────────────────────────────
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    container_name: notification-service
+    restart: unless-stopped
+    ports:
+      - '5005:5005'
+    environment:
+      PORT: 5005
+      NODE_ENV: development
+      MONGO_URI: mongodb://mongo-notification:27017/notification
+      EMAIL_USER: ${EMAIL_USER:-}
+      EMAIL_PASS: ${EMAIL_PASS:-}
+      TWILIO_SID: ${TWILIO_SID:-}
+      TWILIO_AUTH: ${TWILIO_AUTH:-}
+      TWILIO_PHONE: ${TWILIO_PHONE:-}
+    networks:
+      - healthcare-net
+    depends_on:
+      mongo-notification:
+        condition: service_healthy
+
+  # ── MongoDB: Notification ───────────────────────────────────────────────────
+  mongo-notification:
+    image: mongo:7.0
+    container_name: mongo-notification
+    restart: unless-stopped
+    ports:
+      - '27021:27017'
+    volumes:
+      - mongo_notification_data:/data/db
+    networks:
+      - healthcare-net
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 networks:
   healthcare-net:
     driver: bridge
@@ -195,3 +236,4 @@ volumes:
   mongo_payment_data:
   mongo_doctor_data:
   mongo_telemedicine_data:
+  mongo_notification_data:
