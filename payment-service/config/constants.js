@@ -10,6 +10,8 @@ export const PAYMENT_STATUS = Object.freeze({
 });
 
 export const PAYMENT_METHOD = Object.freeze({
+  MANUAL: 'MANUAL',
+  ONLINE: 'ONLINE',
   CREDIT_CARD: 'credit_card',
   DEBIT_CARD: 'debit_card',
   BANK_TRANSFER: 'bank_transfer',
@@ -30,5 +32,6 @@ export const HTTP_STATUS = Object.freeze({
   FORBIDDEN: 403,
   NOT_FOUND: 404,
   CONFLICT: 409,
+  BAD_GATEWAY: 502,
   INTERNAL_SERVER_ERROR: 500,
 });

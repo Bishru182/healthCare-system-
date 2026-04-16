@@ -32,6 +32,7 @@ import SessionsListPage from './pages/telemedicine/SessionsListPage'
 import VideoRoomPage    from './pages/telemedicine/VideoRoomPage'
 
 // Admin pages
+import AdminDoctorVerification from './pages/admin/AdminDoctorVerification'
 import NotificationLogsPage from './pages/admin/NotificationLogsPage'
 import AdminPayments        from './pages/admin/AdminPayments'
 import AdminPaymentDetails  from './pages/admin/AdminPaymentDetails'
@@ -81,6 +82,7 @@ export default function App() {
             {/* Protected admin routes */}
             <Route element={<PrivateRoute role="admin" />}>
               <Route element={<DashboardLayout />}>
+                <Route path="/admin/doctors"              element={<AdminDoctorVerification />} />
                 <Route path="/admin/notifications"        element={<NotificationLogsPage />} />
                 <Route path="/admin/payments"             element={<AdminPayments />} />
                 <Route path="/admin/payments/:id"         element={<AdminPaymentDetails />} />

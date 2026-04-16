@@ -1,9 +1,38 @@
 import Doctor, { SPECIALTIES } from "../models/Doctor.js";
 
+const NOTIFICATION_URL =
+  process.env.NOTIFICATION_SERVICE_URL || "http://notification-service:5005";
+const INTERNAL_API_KEY =
+  process.env.INTER_SERVICE_API_KEY || "medico-internal-key-change-me";
+
+const notifyDoctorVerified = async (doctor) => {
+  if (!NOTIFICATION_URL) return;
+
+  const recipient = { name: doctor.name };
+  if (doctor.email) recipient.email = doctor.email;
+  if (doctor.phone) recipient.phone = doctor.phone;
+
+  if (!recipient.email && !recipient.phone) return;
+
+  try {
+    await fetch(`${NOTIFICATION_URL}/api/notifications/send`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        eventType: "DOCTOR_VERIFIED",
+        channels: ["email", "sms", "whatsapp"],
+        recipients: [recipient],
+        data: {},
+      }),
+    });
+  } catch (error) {
+    console.warn(`⚠️  Failed to send verification notification to Dr. ${doctor.name}: ${error.message}`);
+  }
+};
+
 const hasValidInternalApiKey = (req) => {
-  const expected = process.env.INTER_SERVICE_API_KEY;
   const provided = req.headers["x-internal-api-key"];
-  return Boolean(expected) && typeof provided === "string" && provided === expected;
+  return typeof provided === "string" && provided === INTERNAL_API_KEY;
 };
 
 /**
@@ -16,14 +45,13 @@ export const getSpecialties = (_req, res) => {
 
 /**
  * @route GET /api/doctors
- * Public listing with optional filter by specialty / search / verified.
+ * Public listing of bookable doctors (active + verified).
  */
 export const listDoctors = async (req, res, next) => {
   try {
-    const { specialty, q, onlyVerified } = req.query;
-    const filter = { isActive: true };
+    const { specialty, q } = req.query;
+    const filter = { isActive: true, isVerified: true };
     if (specialty) filter.specialty = specialty;
-    if (onlyVerified === "true") filter.isVerified = true;
     if (q) {
       filter.$or = [
         { name: { $regex: q, $options: "i" } },
@@ -35,6 +63,23 @@ export const listDoctors = async (req, res, next) => {
     res
       .status(200)
       .json({ success: true, count: doctors.length, doctors });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @route GET /api/doctors/admin/pending   (admin only)
+ * Returns doctors waiting for admin verification.
+ */
+export const listPendingDoctors = async (_req, res, next) => {
+  try {
+    const doctors = await Doctor.find({ isActive: true, isVerified: false }).sort({
+      createdAt: 1,
+      name: 1,
+    });
+
+    res.status(200).json({ success: true, count: doctors.length, doctors });
   } catch (error) {
     next(error);
   }
@@ -122,15 +167,19 @@ export const deleteMe = async (req, res, next) => {
 
 /**
  * @route GET /api/doctors/:id
- * Public — used by patient portal to view a doctor's profile.
+ * Public — used by patient portal to view a bookable doctor's profile.
  */
 export const getDoctorById = async (req, res, next) => {
   try {
-    const doctor = await Doctor.findById(req.params.id);
+    const doctor = await Doctor.findOne({
+      _id: req.params.id,
+      isActive: true,
+      isVerified: true,
+    });
     if (!doctor) {
       return res
         .status(404)
-        .json({ success: false, message: "Doctor not found." });
+        .json({ success: false, message: "Doctor not found or unavailable for booking." });
     }
     res.status(200).json({ success: true, doctor });
   } catch (error) {
@@ -182,6 +231,10 @@ export const verifyDoctor = async (req, res, next) => {
         .status(404)
         .json({ success: false, message: "Doctor not found." });
     }
+
+    // Fire-and-forget: notify the doctor their account is approved
+    void notifyDoctorVerified(doctor);
+
     res.status(200).json({
       success: true,
       message: "Doctor verified.",

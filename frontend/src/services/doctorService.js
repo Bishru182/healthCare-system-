@@ -12,6 +12,10 @@ export const doctorService = {
   getById: (id) => doctorApi.get(`/${id}`),
   getAvailabilityByDoctor: (id) => doctorApi.get(`/${id}/availability`),
 
+  // Admin
+  listPendingForVerification: () => doctorApi.get('/admin/pending'),
+  verifyDoctor: (id) => doctorApi.put(`/${id}/verify`),
+
   // Self
   getMe: () => doctorApi.get('/me'),
   updateMe: (data) => doctorApi.put('/me', data),

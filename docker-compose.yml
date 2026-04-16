@@ -45,8 +45,8 @@ services:
       PATIENT_SERVICE_URL: http://patient-service:3001
       NOTIFICATION_SERVICE_URL: http://notification-service:5005
       DOCTOR_SERVICE_URL: http://doctor-service:3004
-      APPOINTMENT_NOTIFICATION_CHANNELS: ${APPOINTMENT_NOTIFICATION_CHANNELS:-email,sms}
-      CONSULTATION_NOTIFICATION_CHANNELS: ${CONSULTATION_NOTIFICATION_CHANNELS:-email,sms}
+      APPOINTMENT_NOTIFICATION_CHANNELS: ${APPOINTMENT_NOTIFICATION_CHANNELS:-email,sms,whatsapp}
+      CONSULTATION_NOTIFICATION_CHANNELS: ${CONSULTATION_NOTIFICATION_CHANNELS:-email,sms,whatsapp}
       INTER_SERVICE_API_KEY: ${INTER_SERVICE_API_KEY:-medico-internal-key-change-me}
     networks:
       - healthcare-net
@@ -70,6 +70,8 @@ services:
       MONGO_URI: mongodb://mongo-payment:27017/payment
       APPOINTMENT_SERVICE_URL: http://appointment-service:3002
       PATIENT_SERVICE_URL: http://patient-service:3001
+      NOTIFICATION_SERVICE_URL: http://notification-service:5005
+      INTER_SERVICE_API_KEY: ${INTER_SERVICE_API_KEY:-medico-internal-key-change-me}
     networks:
       - healthcare-net
     depends_on:
@@ -92,6 +94,7 @@ services:
       JWT_SECRET: medico-shared-jwt-secret-change-in-prod
       MONGO_URI: mongodb://mongo-doctor:27017/doctor
       APPOINTMENT_SERVICE_URL: http://appointment-service:3002
+      NOTIFICATION_SERVICE_URL: http://notification-service:5005
       INTER_SERVICE_API_KEY: ${INTER_SERVICE_API_KEY:-medico-internal-key-change-me}
     networks:
       - healthcare-net
@@ -233,20 +236,12 @@ services:
     restart: unless-stopped
     ports:
       - '5005:5005'
+    env_file:
+      - ./notification-service/.env
     environment:
       PORT: 5005
       NODE_ENV: development
       MONGO_URI: mongodb://mongo-notification:27017/notification
-      EMAIL_USER: ${EMAIL_USER:-}
-      EMAIL_PASS: ${EMAIL_PASS:-}
-      TEXTLK_API_TOKEN: ${TEXTLK_API_TOKEN:-}
-      TEXTLK_SENDER_ID: ${TEXTLK_SENDER_ID:-TextLKDemo}
-      TEXTLK_SMS_API_URL: ${TEXTLK_SMS_API_URL:-https://app.text.lk/api/v3/sms/send}
-      TEXTLK_SMS_TYPE: ${TEXTLK_SMS_TYPE:-plain}
-      TWILIO_SID: ${TWILIO_SID:-}
-      TWILIO_AUTH: ${TWILIO_AUTH:-}
-      TWILIO_PHONE: ${TWILIO_PHONE:-}
-      TWILIO_WHATSAPP_FROM: ${TWILIO_WHATSAPP_FROM:-}
     networks:
       - healthcare-net
     depends_on:

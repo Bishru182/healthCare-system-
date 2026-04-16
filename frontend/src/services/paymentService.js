@@ -20,6 +20,20 @@ export const paymentService = {
   },
 
   /**
+   * Initiate online payment checkout via gateway provider
+   * @param {string} appointmentId - The appointment ID
+   * @param {string} provider - Gateway provider (default: STRIPE)
+   * @returns {Promise<{paymentId: string, redirectUrl: string | null}>}
+   */
+  initiateOnline: async (appointmentId, provider = 'STRIPE') => {
+    const res = await paymentApi.post('/initiate-online', {
+      appointmentId,
+      provider,
+    })
+    return res.data
+  },
+
+  /**
    * Get all payments for the current patient
    * @param {string} patientId - The patient ID
    * @returns {Promise}

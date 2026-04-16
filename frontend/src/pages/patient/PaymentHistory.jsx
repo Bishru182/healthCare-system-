@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { paymentService } from '../../services/paymentService'
 import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
@@ -8,12 +8,43 @@ import Spinner from '../../components/Spinner'
 import './PaymentHistory.css'
 
 export default function PaymentHistoryPage() {
+  const location = useLocation()
+  const navigate = useNavigate()
   const { user } = useAuth()
   const toast = useToast()
   const patientId = user?._id || user?.id
   const [payments, setPayments] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [filter, setFilter] = useState('all') // all, pending, completed, failed
+  const [gatewayBanner, setGatewayBanner] = useState(null)
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const gateway = params.get('gateway')
+    const provider = params.get('provider')
+
+    if (!gateway) {
+      setGatewayBanner(null)
+      return
+    }
+
+    if (gateway === 'success') {
+      setGatewayBanner({
+        type: 'success',
+        text: `${provider || 'Payment gateway'} checkout completed. Payment status will update shortly.`,
+      })
+      toast.success('Gateway checkout completed')
+    } else if (gateway === 'cancelled') {
+      setGatewayBanner({
+        type: 'warning',
+        text: 'Gateway checkout was cancelled. You can retry online payment anytime.',
+      })
+      toast.info('Gateway checkout cancelled')
+    }
+
+    // Keep URLs clean after user sees feedback.
+    navigate(location.pathname, { replace: true })
+  }, [location.pathname, location.search, navigate, toast])
 
   useEffect(() => {
     if (!patientId) {
@@ -63,6 +94,12 @@ export default function PaymentHistoryPage() {
       </div>
 
       {/* Stats Cards */}
+      {gatewayBanner && (
+        <div className={`gateway-banner gateway-banner-${gatewayBanner.type}`}>
+          {gatewayBanner.text}
+        </div>
+      )}
+
       <div className="payment-stats-grid">
         <div className="stat-card">
           <div className="stat-icon stat-total">💳</div>

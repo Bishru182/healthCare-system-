@@ -99,6 +99,16 @@
   color: #e11d48;
 }
 
+.checkout-link {
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.checkout-link:hover {
+  text-decoration: underline;
+}
+
 /* Failure Details */
 .details-failure {
   background: #fef2f2;

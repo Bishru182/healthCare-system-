@@ -1,9 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
-const API_URL =
-  import.meta.env.VITE_NOTIFICATION_API ||
-  'http://localhost:5005/api/notifications/logs';
+const normalizeBase = (value) => {
+  const selected = (value || '/api/notifications').trim();
+  return selected.endsWith('/') ? selected.slice(0, -1) : selected;
+};
+
+const API_URL = `${normalizeBase(import.meta.env.VITE_NOTIFICATION_API)}/logs`;
 
 // ─── Badge colour helpers ─────────────────────
 const statusClasses = {

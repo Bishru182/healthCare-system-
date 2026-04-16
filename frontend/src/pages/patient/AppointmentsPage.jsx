@@ -33,7 +33,7 @@ export default function AppointmentsPage() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    doctorService.listAll().then(({ data }) => setDoctors(data.doctors || [])).catch(() => {})
+    doctorService.listAll({ onlyVerified: true }).then(({ data }) => setDoctors(data.doctors || [])).catch(() => {})
     doctorService.getSpecialties().then(({ data }) => setSpecialties(data.specialties || [])).catch(() => {})
     loadAppointments()
   }, [])

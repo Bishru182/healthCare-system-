@@ -15,14 +15,22 @@ const generateToken = (user) =>
 
 export const registerRules = [
   body("name").trim().notEmpty().withMessage("Name is required"),
-  body("email").isEmail().withMessage("Valid email is required"),
+  body("email")
+    .trim()
+    .toLowerCase()
+    .isEmail()
+    .withMessage("Valid email is required"),
   body("password")
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters"),
 ];
 
 export const loginRules = [
-  body("email").isEmail().withMessage("Valid email is required"),
+  body("email")
+    .trim()
+    .toLowerCase()
+    .isEmail()
+    .withMessage("Valid email is required"),
   body("password").notEmpty().withMessage("Password is required"),
 ];
 
@@ -39,7 +47,8 @@ export const register = async (req, res, next) => {
       return res.status(400).json({ success: false, errors: errors.array() });
     }
 
-    const { name, email, password, age, phone } = req.body;
+    const { name, password, age, phone } = req.body;
+    const email = req.body.email.trim().toLowerCase();
 
     const existingPatient = await Patient.findOne({ email });
     if (existingPatient) {
@@ -79,7 +88,8 @@ export const login = async (req, res, next) => {
       return res.status(400).json({ success: false, errors: errors.array() });
     }
 
-    const { email, password } = req.body;
+    const email = req.body.email.trim().toLowerCase();
+    const { password } = req.body;
 
     const patient = await Patient.findOne({ email }).select("+password");
     if (!patient) {

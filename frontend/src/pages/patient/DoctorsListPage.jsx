@@ -18,7 +18,7 @@ export default function DoctorsListPage() {
   const load = async () => {
     setLoading(true)
     try {
-      const params = {}
+      const params = { onlyVerified: true }
       if (specialty) params.specialty = specialty
       if (query) params.q = query
       const { data } = await doctorService.listAll(params)

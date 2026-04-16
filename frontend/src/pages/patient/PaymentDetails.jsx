@@ -164,6 +164,35 @@ export default function PaymentDetailsPage() {
                 {payment.transactionId || 'Pending...'}
               </span>
             </div>
+            <div className="detail-item">
+              <span className="detail-label">Gateway Provider</span>
+              <span className="detail-value">
+                {payment.gatewayProvider || 'Manual / N/A'}
+              </span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">Gateway Session</span>
+              <span className="detail-value font-mono">
+                {payment.gatewaySessionId || 'Not available'}
+              </span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">Checkout URL</span>
+              <span className="detail-value">
+                {payment.checkoutUrl ? (
+                  <a
+                    className="checkout-link"
+                    href={payment.checkoutUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Open Checkout
+                  </a>
+                ) : (
+                  'Not available'
+                )}
+              </span>
+            </div>
           </div>
         </div>
 

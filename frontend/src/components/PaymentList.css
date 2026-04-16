@@ -72,6 +72,14 @@
   text-transform: capitalize;
 }
 
+.payment-provider {
+  margin-top: 2px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
 /* Date/Time */
 .payment-date {
   color: var(--text-secondary);

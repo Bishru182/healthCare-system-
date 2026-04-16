@@ -26,10 +26,11 @@ export default function LoginPage() {
     e.preventDefault()
     setLoading(true)
     try {
+      const normalizedEmail = email.trim().toLowerCase()
       const { data } =
         selectedRole === 'doctor'
-          ? await doctorAuthService.login({ email, password })
-          : await authService.login({ email, password })
+          ? await doctorAuthService.login({ email: normalizedEmail, password })
+          : await authService.login({ email: normalizedEmail, password })
 
       const userData = selectedRole === 'doctor' ? data.doctor : data.patient
       if (!userData) {

@@ -60,7 +60,10 @@ export default function PaymentList({ payments, isLoading }) {
                 <PaymentStatus status={payment.status} />
               </td>
               <td className="payment-method">
-                {payment.paymentMethod || 'N/A'}
+                <div>{payment.paymentMethod || 'N/A'}</div>
+                {payment.gatewayProvider && (
+                  <div className="payment-provider">via {payment.gatewayProvider}</div>
+                )}
               </td>
               <td className="payment-date">
                 <div className="date-time">

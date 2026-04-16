@@ -12,6 +12,7 @@ import {
 import {
   getSpecialties,
   listDoctors,
+  listPendingDoctors,
   getMe,
   updateMe,
   deleteMe,
@@ -51,6 +52,9 @@ router.post("/login", loginRules, login);
 // ───────── Public ─────────
 router.get("/specialties", getSpecialties);
 router.get("/", listDoctors);
+
+// ───────── Admin doctor review ─────────
+router.get("/admin/pending", auth, roleCheck("admin"), listPendingDoctors);
 
 // ───────── Doctor profile (self) ─────────
 router.get("/me", auth, roleCheck("doctor"), getMe);

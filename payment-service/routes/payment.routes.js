@@ -1,7 +1,7 @@
 // routes/payment.routes.js
 // ─────────────────────────────────────────────
 // Payment Routes
-// All routes are protected by JWT authentication.
+// Webhook route is public; all other routes are JWT protected.
 // ─────────────────────────────────────────────
 
 import { Router } from 'express';
@@ -11,13 +11,17 @@ import { roleCheck } from '../middleware/roleCheck.middleware.js';
 import {
   validate,
   createPaymentRules,
+  initiateOnlinePaymentRules,
   changeStatusRules,
   failPaymentRules,
   mongoIdParam,
+  webhookProviderParamRule,
 } from '../middleware/validate.middleware.js';
 
 import {
+  handleProviderWebhook,
   createPayment,
+  initiateOnlinePayment,
   confirmPayment,
   failPayment,
   getPaymentById,
@@ -27,8 +31,30 @@ import {
 
 const router = Router();
 
+// ─── POST /api/payments/webhook/:provider ───────────────────────────────────
+/**
+ * @route   POST /api/payments/webhook/:provider
+ * @desc    Generic provider webhook endpoint (Stripe, PayHere, ...)
+ * @access  Public (provider callbacks)
+ */
+router.post('/webhook/:provider', webhookProviderParamRule, validate, handleProviderWebhook);
+
 // Apply JWT auth to every route in this router
 router.use(authMiddleware);
+
+// ─── POST /api/payments/initiate-online ─────────────────────────────────────
+/**
+ * @route   POST /api/payments/initiate-online
+ * @desc    Start online checkout using selected provider
+ * @access  Private (requires JWT)
+ * @body    { appointmentId, provider }
+ */
+router.post(
+  '/initiate-online',
+  initiateOnlinePaymentRules,
+  validate,
+  initiateOnlinePayment
+);
 
 // ─── POST /api/payments/create ───────────────────────────────────────────────
 /**

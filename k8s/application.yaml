@@ -33,6 +33,21 @@ spec:
                 secretKeyRef:
                   name: healthcare-secrets
                   key: JWT_SECRET
+            - name: PATIENT_SERVICE_URL
+              value: http://patient-service:3001
+            - name: DOCTOR_SERVICE_URL
+              value: http://doctor-service:3004
+            - name: NOTIFICATION_SERVICE_URL
+              value: http://notification-service:5005
+            - name: APPOINTMENT_NOTIFICATION_CHANNELS
+              value: email,sms,whatsapp
+            - name: CONSULTATION_NOTIFICATION_CHANNELS
+              value: email,sms,whatsapp
+            - name: INTER_SERVICE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: healthcare-secrets
+                  key: INTER_SERVICE_API_KEY
           readinessProbe:
             httpGet:
               path: /
@@ -98,6 +113,11 @@ spec:
               value: http://appointment-service:3002
             - name: DOCTOR_SERVICE_URL
               value: http://doctor-service:3004
+            - name: INTER_SERVICE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: healthcare-secrets
+                  key: INTER_SERVICE_API_KEY
             - name: CLOUD_NAME
               valueFrom:
                 secretKeyRef:
@@ -243,6 +263,11 @@ spec:
                   key: JWT_SECRET
             - name: APPOINTMENT_SERVICE_URL
               value: http://appointment-service:3002
+            - name: INTER_SERVICE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: healthcare-secrets
+                  key: INTER_SERVICE_API_KEY
           readinessProbe:
             httpGet:
               path: /
@@ -336,6 +361,80 @@ spec:
   ports:
     - port: 3005
       targetPort: 3005
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service
+  namespace: healthcare
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notification-service
+  template:
+    metadata:
+      labels:
+        app: notification-service
+    spec:
+      containers:
+        - name: notification-service
+          image: notification-service:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5005
+          env:
+            - name: PORT
+              value: "5005"
+            - name: NODE_ENV
+              value: production
+            - name: MONGO_URI
+              value: mongodb://mongo:27017/notification
+            - name: EMAIL_USER
+              value: ""
+            - name: EMAIL_PASS
+              value: ""
+            - name: TEXTLK_API_TOKEN
+              value: ""
+            - name: TEXTLK_SENDER_ID
+              value: ""
+            - name: TEXTLK_SMS_API_URL
+              value: https://app.text.lk/api/v3/sms/send
+            - name: TEXTLK_SMS_TYPE
+              value: plain
+            - name: TWILIO_SID
+              value: ""
+            - name: TWILIO_AUTH
+              value: ""
+            - name: TWILIO_PHONE
+              value: ""
+            - name: TWILIO_WHATSAPP_FROM
+              value: ""
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5005
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5005
+            initialDelaySeconds: 30
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-service
+  namespace: healthcare
+spec:
+  selector:
+    app: notification-service
+  ports:
+    - port: 5005
+      targetPort: 5005
   type: ClusterIP
 ---
 apiVersion: apps/v1

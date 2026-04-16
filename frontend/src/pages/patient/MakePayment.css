@@ -51,6 +51,52 @@
   min-height: 300px;
 }
 
+.online-checkout-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 24px 0;
+  color: var(--text-secondary);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.online-checkout-divider::before,
+.online-checkout-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.online-checkout-divider span {
+  padding: 0 12px;
+}
+
+.online-checkout-box {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  background: #f8fafc;
+}
+
+.online-checkout-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.online-checkout-text {
+  margin: 8px 0 16px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.online-checkout-btn {
+  width: 100%;
+}
+
 /* Info Section */
 .info-card,
 .faq-card,

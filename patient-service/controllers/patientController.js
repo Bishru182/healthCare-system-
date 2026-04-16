@@ -2,10 +2,12 @@ import Patient from "../models/Patient.js";
 import Report from "../models/Report.js";
 import { cloudinary } from "../config/cloudinary.js";
 
+const INTERNAL_API_KEY =
+  process.env.INTER_SERVICE_API_KEY || "medico-internal-key-change-me";
+
 const hasValidInternalApiKey = (req) => {
-  const expected = process.env.INTER_SERVICE_API_KEY;
   const provided = req.headers["x-internal-api-key"];
-  return Boolean(expected) && typeof provided === "string" && provided === expected;
+  return typeof provided === "string" && provided === INTERNAL_API_KEY;
 };
 
 /**

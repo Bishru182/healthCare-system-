@@ -7,10 +7,55 @@
 
 import twilio from 'twilio';
 
-const client = twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH);
+const normalizePhoneNumber = (value) => {
+  const input = String(value || '').trim().replace(/^whatsapp:/i, '');
+
+  if (!input) {
+    throw new Error('Recipient phone number is required.');
+  }
+
+  if (input.startsWith('+')) {
+    const digits = input.slice(1).replace(/\D/g, '');
+    if (!digits) {
+      throw new Error('Recipient phone number is invalid.');
+    }
+    return `+${digits}`;
+  }
+
+  const digits = input.replace(/\D/g, '');
+  if (!digits) {
+    throw new Error('Recipient phone number is invalid.');
+  }
+
+  if (digits.startsWith('00')) {
+    return `+${digits.slice(2)}`;
+  }
+
+  if (digits.startsWith('94')) {
+    return `+${digits}`;
+  }
+
+  if (digits.startsWith('0')) {
+    return `+94${digits.slice(1)}`;
+  }
+
+  if (digits.length === 9) {
+    return `+94${digits}`;
+  }
+
+  return `+${digits}`;
+};
+
+const getTwilioClient = () => {
+  if (!process.env.TWILIO_SID || !process.env.TWILIO_AUTH) {
+    throw new Error('TWILIO_SID and TWILIO_AUTH must be set for Twilio messaging.');
+  }
+
+  return twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH);
+};
 
 const normalizeWhatsAppAddress = (value) =>
-  value?.startsWith('whatsapp:') ? value : `whatsapp:${value}`;
+  `whatsapp:${normalizePhoneNumber(value)}`;
 
 /**
  * Send an SMS message via Twilio.
@@ -19,13 +64,14 @@ const normalizeWhatsAppAddress = (value) =>
  * @returns {Promise<object>} Twilio message instance
  */
 const sendSMS = async (to, body) => {
-  const message = await client.messages.create({
+  const from = normalizePhoneNumber(process.env.TWILIO_PHONE);
+  const message = await getTwilioClient().messages.create({
     body,
-    from: process.env.TWILIO_PHONE,
-    to,
+    from,
+    to: normalizePhoneNumber(to),
   });
 
-  console.log(`📱  SMS sent to ${to}  (sid: ${message.sid})`);
+  console.log(`📱  SMS sent to ${normalizePhoneNumber(to)}  (sid: ${message.sid})`);
   return message;
 };
 
@@ -42,13 +88,13 @@ export const sendWhatsApp = async (to, body) => {
     throw new Error('TWILIO_WHATSAPP_FROM or TWILIO_PHONE must be set for WhatsApp sending.');
   }
 
-  const message = await client.messages.create({
+  const message = await getTwilioClient().messages.create({
     body,
     from: normalizeWhatsAppAddress(fromValue),
     to: normalizeWhatsAppAddress(to),
   });
 
-  console.log(`💬  WhatsApp sent to ${to}  (sid: ${message.sid})`);
+  console.log(`💬  WhatsApp sent to ${normalizePhoneNumber(to)}  (sid: ${message.sid})`);
   return message;
 };
 

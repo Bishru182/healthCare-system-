@@ -42,6 +42,55 @@ export const createPayment = async (req, res, next) => {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// POST /api/payments/initiate-online
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Initiate an online checkout flow through a selected provider.
+ * Returns the persisted paymentId and gateway redirect URL.
+ */
+export const initiateOnlinePayment = async (req, res, next) => {
+  try {
+    const { appointmentId, provider } = req.body;
+
+    const result = await paymentService.initiateOnlinePayment({
+      patientId: req.user.id,
+      appointmentId,
+      provider,
+      authorizationHeader: req.headers.authorization,
+      userRole: req.user.role,
+    });
+
+    return res.status(HTTP_STATUS.CREATED).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// POST /api/payments/webhook/:provider
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Generic gateway webhook endpoint.
+ * Signature verification and event parsing are delegated to provider services.
+ */
+export const handleProviderWebhook = async (req, res, next) => {
+  try {
+    const result = await paymentService.handleGatewayWebhook({
+      provider: req.params.provider,
+      headers: req.headers,
+      rawBody: req.rawBody,
+      body: req.body,
+    });
+
+    return res.status(HTTP_STATUS.OK).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // POST /api/payments/confirm
 // ─────────────────────────────────────────────────────────────────────────────
 

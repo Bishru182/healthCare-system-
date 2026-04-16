@@ -1,5 +1,9 @@
 param(
-  [string]$Namespace = 'healthcare'
+  [string]$Namespace = 'healthcare',
+  [string]$AdminEmail = 'admin@medico.local',
+  [string]$AdminPassword = 'admin123456',
+  [string]$AdminName = 'Administrator',
+  [switch]$SkipAdminSeed
 )
 
 $ErrorActionPreference = 'Stop'
@@ -24,6 +28,7 @@ $images = @(
   @{ Name = 'payment-service:local'; Context = './payment-service' },
   @{ Name = 'doctor-service:local'; Context = './doctor-service' },
   @{ Name = 'telemedicine-service:local'; Context = './telemedicine-service' },
+  @{ Name = 'notification-service:local'; Context = './notification-service' },
   @{ Name = 'frontend:local'; Context = './frontend' }
 )
 
@@ -56,23 +61,59 @@ Write-Host 'Applying Kubernetes manifests...' -ForegroundColor Cyan
 kubectl apply -k ./k8s
 
 $deployments = @(
-  'mongo',
   'appointment-service',
   'patient-service',
   'payment-service',
   'doctor-service',
   'telemedicine-service',
+  'notification-service',
   'frontend'
 )
+
+$deploymentsToCheck = @('mongo') + $deployments
 
 Write-Host 'Restarting deployments to pick up latest :local images...' -ForegroundColor Cyan
 foreach ($d in $deployments) {
   kubectl rollout restart deployment/$d -n $Namespace | Out-Null
 }
 
-foreach ($d in $deployments) {
+foreach ($d in $deploymentsToCheck) {
   Write-Host "Waiting for deployment/$d..." -ForegroundColor Cyan
   kubectl rollout status deployment/$d -n $Namespace --timeout=300s
+}
+
+if (-not $SkipAdminSeed) {
+  Write-Host 'Ensuring default admin account exists in patient-service DB...' -ForegroundColor Cyan
+  $seedCmd = @'
+import mongoose from 'mongoose';
+import Patient from './models/Patient.js';
+
+const email = process.env.ADMIN_EMAIL;
+const password = process.env.ADMIN_PASSWORD;
+const name = process.env.ADMIN_NAME;
+
+await mongoose.connect(process.env.MONGO_URI);
+let patient = await Patient.findOne({ email }).select('+password');
+if (!patient) {
+  patient = await Patient.create({
+    name,
+    email,
+    password,
+    role: 'admin',
+    age: 30,
+    phone: '+1-555-0000'
+  });
+  console.log(`Created admin user ${email}`);
+} else {
+  patient.name = name;
+  patient.role = 'admin';
+  patient.password = password;
+  await patient.save();
+  console.log(`Updated admin user ${email}`);
+}
+await mongoose.disconnect();
+'@
+  kubectl exec -n $Namespace deployment/patient-service -- env "ADMIN_EMAIL=$AdminEmail" "ADMIN_PASSWORD=$AdminPassword" "ADMIN_NAME=$AdminName" node --input-type=module -e $seedCmd
 }
 
 Write-Host 'Kubernetes deployment is ready.' -ForegroundColor Green

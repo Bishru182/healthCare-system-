@@ -18,6 +18,7 @@ const patientNavItems = [
 ]
 
 const adminNavItems = [
+  { to: '/admin/doctors',         label: 'Doctor Verification', icon: '✅' },
   { to: '/admin/notifications',   label: 'Notification Logs', icon: '🔔' },
   { to: '/admin/payments',        label: 'Payment Management', icon: '💳' },
 ]

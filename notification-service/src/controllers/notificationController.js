@@ -7,9 +7,21 @@
 
 import NotificationLog from '../models/NotificationLog.js';
 import sendEmail       from '../config/mailer.js';
-import sendSMS         from '../config/textlk.js';
-import { sendWhatsApp } from '../config/twilio.js';
+import sendTextLkSMS   from '../config/textlk.js';
+import sendTwilioSMS, { sendWhatsApp } from '../config/twilio.js';
 import getTemplate     from '../services/templateService.js';
+
+const hasTextLkSmsConfig = () =>
+  Boolean(process.env.TEXTLK_API_TOKEN && process.env.TEXTLK_SENDER_ID);
+
+const hasTwilioBaseConfig = () =>
+  Boolean(process.env.TWILIO_SID && process.env.TWILIO_AUTH);
+
+const hasTwilioSmsConfig = () =>
+  Boolean(hasTwilioBaseConfig() && process.env.TWILIO_PHONE);
+
+const hasTwilioWhatsAppConfig = () =>
+  Boolean(hasTwilioBaseConfig() && (process.env.TWILIO_WHATSAPP_FROM || process.env.TWILIO_PHONE));
 
 // ─────────────────────────────────────────────
 // POST /api/notifications/send
@@ -28,9 +40,13 @@ import getTemplate     from '../services/templateService.js';
 // ─────────────────────────────────────────────
 export const sendNotification = async (req, res) => {
   const { eventType, channels = [], recipients = [], data = {} } = req.body;
+  const normalizedChannels = Array.isArray(channels)
+    ? channels.map((channel) => String(channel).trim().toLowerCase()).filter(Boolean)
+    : [];
+  const normalizedRecipients = Array.isArray(recipients) ? recipients : [];
 
   // Validate required fields
-  if (!eventType || !channels.length || !recipients.length) {
+  if (!eventType || !normalizedChannels.length || !normalizedRecipients.length) {
     return res.status(400).json({
       success: false,
       message: 'eventType, channels, and recipients are required.',
@@ -44,11 +60,15 @@ export const sendNotification = async (req, res) => {
   });
 
   // ── Background processing ───────────────────────────────────────────
-  for (const recipient of recipients) {
+  const textLkSmsEnabled = hasTextLkSmsConfig();
+  const twilioSmsEnabled = hasTwilioSmsConfig();
+  const twilioWhatsAppEnabled = hasTwilioWhatsAppConfig();
+
+  for (const recipient of normalizedRecipients) {
     const { subject, message } = getTemplate(eventType, data);
 
     // ── Email channel ───────────────────────────────────────────────
-    if (channels.includes('email') && recipient.email) {
+    if (normalizedChannels.includes('email') && recipient.email) {
       try {
         await sendEmail(recipient.email, subject, message);
         await NotificationLog.create({
@@ -70,46 +90,89 @@ export const sendNotification = async (req, res) => {
     }
 
     // ── SMS channel ─────────────────────────────────────────────────
-    if (channels.includes('sms') && recipient.phone) {
-      try {
-        await sendSMS(recipient.phone, message);
+    if (normalizedChannels.includes('sms') && recipient.phone) {
+      let smsDelivered = false;
+      const smsErrors = [];
+
+      if (textLkSmsEnabled) {
+        try {
+          await sendTextLkSMS(recipient.phone, message);
+          smsDelivered = true;
+        } catch (error) {
+          smsErrors.push(`Text.lk: ${error.message}`);
+          if (twilioSmsEnabled) {
+            console.warn(
+              `⚠️  Text.lk SMS failed for ${recipient.phone}. Retrying with Twilio SMS...`
+            );
+          }
+        }
+      }
+
+      if (!smsDelivered && twilioSmsEnabled) {
+        try {
+          await sendTwilioSMS(recipient.phone, message);
+          smsDelivered = true;
+        } catch (error) {
+          smsErrors.push(`Twilio: ${error.message}`);
+        }
+      }
+
+      if (smsDelivered) {
         await NotificationLog.create({
           eventType,
           recipient: recipient.phone,
           channel: 'sms',
           status: 'sent',
         });
-      } catch (error) {
-        console.error(`❌  SMS failed for ${recipient.phone}:`, error.message);
+      } else {
+        const configMessage =
+          !textLkSmsEnabled && !twilioSmsEnabled
+            ? 'No SMS provider configured. Set TEXTLK_API_TOKEN/TEXTLK_SENDER_ID or TWILIO_SID/TWILIO_AUTH/TWILIO_PHONE.'
+            : null;
+        const errorMessage = configMessage || smsErrors.join(' | ') || 'SMS delivery failed.';
+        console.error(`❌  SMS failed for ${recipient.phone}:`, errorMessage);
         await NotificationLog.create({
           eventType,
           recipient: recipient.phone,
           channel: 'sms',
           status: 'failed',
-          errorMessage: error.message,
+          errorMessage,
         });
       }
     }
 
     // ── WhatsApp channel ───────────────────────────────────────────
-    if (channels.includes('whatsapp') && recipient.phone) {
-      try {
-        await sendWhatsApp(recipient.phone, message);
-        await NotificationLog.create({
-          eventType,
-          recipient: recipient.phone,
-          channel: 'whatsapp',
-          status: 'sent',
-        });
-      } catch (error) {
-        console.error(`❌  WhatsApp failed for ${recipient.phone}:`, error.message);
+    if (normalizedChannels.includes('whatsapp') && recipient.phone) {
+      if (!twilioWhatsAppEnabled) {
+        const errorMessage =
+          'Twilio WhatsApp is not configured. Set TWILIO_SID/TWILIO_AUTH and TWILIO_WHATSAPP_FROM (or TWILIO_PHONE).';
+        console.error(`❌  WhatsApp failed for ${recipient.phone}:`, errorMessage);
         await NotificationLog.create({
           eventType,
           recipient: recipient.phone,
           channel: 'whatsapp',
           status: 'failed',
-          errorMessage: error.message,
+          errorMessage,
         });
+      } else {
+        try {
+          await sendWhatsApp(recipient.phone, message);
+          await NotificationLog.create({
+            eventType,
+            recipient: recipient.phone,
+            channel: 'whatsapp',
+            status: 'sent',
+          });
+        } catch (error) {
+          console.error(`❌  WhatsApp failed for ${recipient.phone}:`, error.message);
+          await NotificationLog.create({
+            eventType,
+            recipient: recipient.phone,
+            channel: 'whatsapp',
+            status: 'failed',
+            errorMessage: error.message,
+          });
+        }
       }
     }
   }

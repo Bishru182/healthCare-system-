@@ -1,8 +1,44 @@
 import Appointment from "../models/Appointment.js";
 import {
   queueAppointmentBookedNotification,
+  queueAppointmentCancelledNotification,
+  queueAppointmentConfirmedNotification,
   queueConsultationCompletedNotification,
 } from "../services/notificationIntegrationService.js";
+
+const DOCTOR_SERVICE_URL =
+  process.env.DOCTOR_SERVICE_URL || "http://doctor-service:3004";
+const DOCTOR_LOOKUP_TIMEOUT_MS = Number(
+  process.env.DOCTOR_LOOKUP_TIMEOUT_MS || 5000
+);
+
+const getLookupSignal = () => {
+  if (
+    typeof AbortSignal !== "undefined" &&
+    typeof AbortSignal.timeout === "function"
+  ) {
+    return AbortSignal.timeout(DOCTOR_LOOKUP_TIMEOUT_MS);
+  }
+  return undefined;
+};
+
+const isDoctorBookable = async (doctorId) => {
+  const response = await fetch(`${DOCTOR_SERVICE_URL}/api/doctors/${doctorId}`, {
+    method: "GET",
+    signal: getLookupSignal(),
+  });
+
+  if (response.status === 404 || response.status === 400) {
+    return false;
+  }
+
+  if (!response.ok) {
+    const details = await response.text();
+    throw new Error(`Doctor lookup failed with status ${response.status}: ${details}`);
+  }
+
+  return true;
+};
 
 // ──── Helper: normalize a Date to midnight UTC (strips time) ────
 const toDateOnly = (value) => {
@@ -32,6 +68,24 @@ export const createAppointment = async (req, res, next) => {
       return res.status(400).json({
         success: false,
         message: "Cannot book an appointment in the past.",
+      });
+    }
+
+    let doctorAvailableForBooking = false;
+    try {
+      doctorAvailableForBooking = await isDoctorBookable(doctorId);
+    } catch (error) {
+      console.warn(`Doctor validation failed during booking: ${error.message}`);
+      return res.status(503).json({
+        success: false,
+        message: "Unable to validate doctor availability right now. Please try again.",
+      });
+    }
+
+    if (!doctorAvailableForBooking) {
+      return res.status(400).json({
+        success: false,
+        message: "Selected doctor is not verified by admin yet or unavailable for booking.",
       });
     }
 
@@ -156,6 +210,9 @@ export const deleteAppointment = async (req, res, next) => {
     appointment.status = "cancelled";
     await appointment.save();
 
+    // Notify both patient and doctor when an appointment is cancelled.
+    void queueAppointmentCancelledNotification({ appointment });
+
     res.status(200).json({
       success: true,
       message: "Appointment cancelled successfully.",
@@ -252,8 +309,20 @@ export const updateAppointmentStatus = async (req, res, next) => {
       });
     }
 
+    if (appointment.status === status) {
+      return res.status(400).json({
+        success: false,
+        message: `Appointment is already '${status}'.`,
+      });
+    }
+
     appointment.status = status;
     await appointment.save();
+
+    if (status === "confirmed") {
+      // Notify both patient and doctor when a doctor confirms an appointment.
+      void queueAppointmentConfirmedNotification({ appointment });
+    }
 
     if (status === "completed") {
       // Notify both patient and doctor when consultation is completed.

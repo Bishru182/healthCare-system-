@@ -17,6 +17,8 @@ export default function MakePaymentPage() {
   const [appointments, setAppointments] = useState([])
   const [isLoadingAppointments, setIsLoadingAppointments] = useState(true)
   const [isProcessingPayment, setIsProcessingPayment] = useState(false)
+  const [isProcessingOnline, setIsProcessingOnline] = useState(false)
+  const [onlineAppointmentId, setOnlineAppointmentId] = useState('')
   const [createdPayment, setCreatedPayment] = useState(null)
 
   useEffect(() => {
@@ -66,6 +68,38 @@ export default function MakePaymentPage() {
     }
   }
 
+  const onlineEligibleAppointments = appointments.filter(
+    (apt) => apt.status === 'confirmed' || apt.status === 'pending'
+  )
+
+  const handleOnlineCheckout = async () => {
+    if (!onlineAppointmentId) {
+      toast.error('Please select an appointment for online checkout')
+      return
+    }
+
+    setIsProcessingOnline(true)
+    try {
+      const result = await paymentService.initiateOnline(onlineAppointmentId, 'STRIPE')
+
+      if (result?.redirectUrl) {
+        toast.info('Redirecting to Stripe checkout...')
+        window.location.assign(result.redirectUrl)
+        return
+      }
+
+      toast.warning('Online payment initialized without redirect URL. Opening payment details.')
+      if (result?.paymentId) {
+        navigate(`/patient/payments/${result.paymentId}`)
+      }
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Failed to initiate online payment'
+      toast.error(msg)
+    } finally {
+      setIsProcessingOnline(false)
+    }
+  }
+
   return (
     <div className="dashboard-page fade-in">
       {/* Page Header */}
@@ -90,11 +124,57 @@ export default function MakePaymentPage() {
                   <Spinner />
                 </div>
               ) : (
-                <PaymentForm
-                  onSubmit={handlePaymentSubmit}
-                  isLoading={isProcessingPayment}
-                  appointments={appointments}
-                />
+                <>
+                  <PaymentForm
+                    onSubmit={handlePaymentSubmit}
+                    isLoading={isProcessingPayment}
+                    appointments={appointments}
+                  />
+
+                  <div className="online-checkout-divider">
+                    <span>OR</span>
+                  </div>
+
+                  <div className="online-checkout-box">
+                    <h3 className="online-checkout-title">Pay Online with Stripe</h3>
+                    <p className="online-checkout-text">
+                      Start secure gateway checkout and complete payment in your browser.
+                    </p>
+
+                    <div className="form-group">
+                      <label htmlFor="online-appointment-select" className="form-label">
+                        Appointment for Online Checkout
+                      </label>
+                      <select
+                        id="online-appointment-select"
+                        className="form-select"
+                        value={onlineAppointmentId}
+                        onChange={(e) => setOnlineAppointmentId(e.target.value)}
+                        disabled={isProcessingOnline}
+                      >
+                        <option value="">Choose an appointment...</option>
+                        {onlineEligibleAppointments.length > 0 ? (
+                          onlineEligibleAppointments.map((apt) => (
+                            <option key={apt._id} value={apt._id}>
+                              Doctor {apt.doctorId ? apt.doctorId.slice(-4) : '?'} - {new Date(apt.date).toLocaleDateString()} at {apt.time}
+                            </option>
+                          ))
+                        ) : (
+                          <option disabled>No pending appointments available</option>
+                        )}
+                      </select>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="btn btn-primary btn-lg online-checkout-btn"
+                      onClick={handleOnlineCheckout}
+                      disabled={isProcessingOnline}
+                    >
+                      {isProcessingOnline ? 'Redirecting...' : 'Proceed to Stripe Checkout'}
+                    </button>
+                  </div>
+                </>
               )}
             </div>
           </div>

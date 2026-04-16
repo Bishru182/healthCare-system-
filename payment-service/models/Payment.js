@@ -58,11 +58,39 @@ const paymentSchema = new mongoose.Schema(
         values: Object.values(PAYMENT_METHOD),
         message: `paymentMethod must be one of: ${Object.values(PAYMENT_METHOD).join(', ')}`,
       },
-      default: PAYMENT_METHOD.CREDIT_CARD,
+      default: PAYMENT_METHOD.MANUAL,
+    },
+
+    // Gateway provider used for online payments (STRIPE, PAYHERE, ...)
+    gatewayProvider: {
+      type: String,
+      default: null,
+      uppercase: true,
+      trim: true,
+    },
+
+    // Checkout/session identifier from the gateway (e.g., Stripe session id)
+    gatewaySessionId: {
+      type: String,
+      default: null,
+      trim: true,
     },
 
     // Unique ID returned by the payment gateway on success
     transactionId: {
+      type: String,
+      default: null,
+      trim: true,
+    },
+
+    // Raw gateway payload for audits/troubleshooting
+    gatewayResponse: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null,
+    },
+
+    // Redirect URL for online checkout flows
+    checkoutUrl: {
       type: String,
       default: null,
       trim: true,

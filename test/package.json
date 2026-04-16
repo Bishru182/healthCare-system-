@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "test": "node run-tests.js",
-    "test:telemedicine:e2e": "playwright test telemedicine-playwright.spec.js --reporter=list"
+    "test:telemedicine:e2e": "playwright test telemedicine-playwright.spec.js --reporter=list",
+    "test:notification:e2e": "playwright test notification-playwright.spec.js --reporter=list",
+    "test:payment:e2e": "playwright test payment-playwright.spec.js --reporter=list"
   },
   "dependencies": {
     "axios": "^1.7.2",

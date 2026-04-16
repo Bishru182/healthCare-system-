@@ -42,7 +42,16 @@ const allowedOrigins = (process.env.CORS_ORIGINS
 app.use(cors({ origin: allowedOrigins, credentials: true }));
 
 // Parse incoming JSON bodies
-app.use(express.json({ limit: '10kb' }));
+app.use(
+  express.json({
+    limit: '100kb',
+    verify: (req, _res, buf) => {
+      if (req.originalUrl.startsWith('/api/payments/webhook/')) {
+        req.rawBody = Buffer.from(buf);
+      }
+    },
+  })
+);
 
 // Parse URL-encoded bodies (for form submissions)
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));

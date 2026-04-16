@@ -4,7 +4,8 @@ const NOTIFICATION_SERVICE_URL =
   process.env.NOTIFICATION_SERVICE_URL || "http://notification-service:5005";
 const DOCTOR_SERVICE_URL =
   process.env.DOCTOR_SERVICE_URL || "http://doctor-service:3004";
-const INTER_SERVICE_API_KEY = process.env.INTER_SERVICE_API_KEY || "";
+const INTER_SERVICE_API_KEY =
+  process.env.INTER_SERVICE_API_KEY || "medico-internal-key-change-me";
 
 const REQUEST_TIMEOUT_MS = Number(process.env.INTER_SERVICE_HTTP_TIMEOUT_MS || 5000);
 const SUPPORTED_NOTIFICATION_CHANNELS = new Set(["email", "sms", "whatsapp"]);
@@ -16,12 +17,12 @@ const parseChannels = (value) =>
     .filter((channel) => SUPPORTED_NOTIFICATION_CHANNELS.has(channel));
 
 const APPOINTMENT_NOTIFICATION_CHANNELS = parseChannels(
-  process.env.APPOINTMENT_NOTIFICATION_CHANNELS || "email,sms"
+  process.env.APPOINTMENT_NOTIFICATION_CHANNELS || "email,sms,whatsapp"
 );
 const CONSULTATION_NOTIFICATION_CHANNELS = parseChannels(
   process.env.CONSULTATION_NOTIFICATION_CHANNELS ||
     process.env.APPOINTMENT_NOTIFICATION_CHANNELS ||
-    "email,sms"
+    "email,sms,whatsapp"
 );
 
 const getSignal = () => {
@@ -80,6 +81,17 @@ const fetchDoctorContact = async (doctorId) => {
   return body?.doctor || null;
 };
 
+const fetchContactSafely = async (lookupLabel, lookup, id) => {
+  if (!id) return null;
+
+  try {
+    return await lookup(id);
+  } catch (error) {
+    console.warn(`Failed to resolve ${lookupLabel} contact ${id}: ${error.message}`);
+    return null;
+  }
+};
+
 const buildRecipient = (contact, fallbackName) => {
   if (!contact) return null;
 
@@ -125,19 +137,17 @@ const queueEventNotification = async ({ eventType, channels, appointment }) => {
     return;
   }
 
-  if (!INTER_SERVICE_API_KEY) {
-    console.warn("INTER_SERVICE_API_KEY is required for internal contact lookups.");
-    return;
-  }
-
   try {
     const [patient, doctor] = await Promise.all([
-      fetchPatientContact(appointment.patientId),
-      fetchDoctorContact(appointment.doctorId),
+      fetchContactSafely("patient", fetchPatientContact, appointment.patientId),
+      fetchContactSafely("doctor", fetchDoctorContact, appointment.doctorId),
     ]);
 
     const recipients = resolveRecipients(patient, doctor);
     if (!hasAddressableRecipientsForChannels(recipients, channels)) {
+      console.warn(
+        `Skipping ${eventType} notification due to missing contact details for configured channels.`
+      );
       return;
     }
 
@@ -156,6 +166,7 @@ const queueEventNotification = async ({ eventType, channels, appointment }) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        ...getInternalHeaders(),
       },
       body: JSON.stringify(payload),
       signal: getSignal(),
@@ -173,6 +184,20 @@ const queueEventNotification = async ({ eventType, channels, appointment }) => {
 export const queueAppointmentBookedNotification = async ({ appointment }) =>
   queueEventNotification({
     eventType: "APPOINTMENT_BOOKED",
+    channels: APPOINTMENT_NOTIFICATION_CHANNELS,
+    appointment,
+  });
+
+export const queueAppointmentConfirmedNotification = async ({ appointment }) =>
+  queueEventNotification({
+    eventType: "APPOINTMENT_CONFIRMED",
+    channels: APPOINTMENT_NOTIFICATION_CHANNELS,
+    appointment,
+  });
+
+export const queueAppointmentCancelledNotification = async ({ appointment }) =>
+  queueEventNotification({
+    eventType: "APPOINTMENT_CANCELLED",
     channels: APPOINTMENT_NOTIFICATION_CHANNELS,
     appointment,
   });

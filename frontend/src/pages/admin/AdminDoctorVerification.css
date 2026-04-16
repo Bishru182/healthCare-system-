@@ -1,0 +1,79 @@
+.verification-summary-grid {
+  display: grid;
+  grid-template-columns: minmax(180px, 280px);
+  margin-bottom: 20px;
+}
+
+.verification-summary-card {
+  background: linear-gradient(135deg, #0ea5e9 0%, #1d4ed8 100%);
+  color: #ffffff;
+  border-radius: 12px;
+  padding: 18px 20px;
+  box-shadow: 0 8px 20px rgba(14, 165, 233, 0.2);
+}
+
+.verification-summary-label {
+  display: block;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.9;
+}
+
+.verification-summary-value {
+  display: block;
+  margin-top: 6px;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.verification-table {
+  display: flex;
+  flex-direction: column;
+}
+
+.verification-row {
+  display: grid;
+  grid-template-columns: 2fr 1.4fr 1fr 1fr 1.5fr 1.2fr;
+  gap: 14px;
+  align-items: center;
+  padding: 14px 18px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.verification-row-head {
+  background: #f8fafc;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.doctor-name {
+  margin: 0;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.doctor-email {
+  margin: 3px 0 0;
+  font-size: 0.82rem;
+  color: #64748b;
+}
+
+@media (max-width: 980px) {
+  .verification-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 16px;
+  }
+
+  .verification-row-head {
+    display: none;
+  }
+
+  .verification-row {
+    padding: 16px;
+  }
+}

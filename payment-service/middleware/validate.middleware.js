@@ -42,6 +42,19 @@ export const createPaymentRules = [
     .withMessage(`paymentMethod must be one of: ${Object.values(PAYMENT_METHOD).join(', ')}`),
 ];
 
+// ─── Rules: Initiate Online Payment ─────────────────────────────────────────
+export const initiateOnlinePaymentRules = [
+  body('appointmentId')
+    .notEmpty().withMessage('appointmentId is required')
+    .isMongoId().withMessage('appointmentId must be a valid MongoDB ObjectId'),
+
+  body('provider')
+    .notEmpty().withMessage('provider is required')
+    .customSanitizer((value) => String(value).trim().toUpperCase())
+    .isIn(['STRIPE', 'PAYHERE'])
+    .withMessage('provider must be either STRIPE or PAYHERE'),
+];
+
 // ─── Rules: Confirm / Fail Payment ───────────────────────────────────────────
 export const changeStatusRules = [
   body('paymentId')
@@ -62,4 +75,12 @@ export const failPaymentRules = [
 export const mongoIdParam = (paramName) => [
   param(paramName)
     .isMongoId().withMessage(`${paramName} must be a valid MongoDB ObjectId`),
+];
+
+// ─── Rules: Webhook provider param ──────────────────────────────────────────
+export const webhookProviderParamRule = [
+  param('provider')
+    .customSanitizer((value) => String(value).trim().toLowerCase())
+    .isIn(['stripe', 'payhere'])
+    .withMessage('provider must be stripe or payhere'),
 ];
