@@ -118,6 +118,14 @@ cp appointment-service/.env.example appointment-service/.env
 PORT=3002
 MONGO_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/medico?appName=<appName>
 JWT_SECRET=your_strong_jwt_secret_here   # Must be identical to Patient Service JWT_SECRET
+PATIENT_SERVICE_URL=http://localhost:3001
+NOTIFICATION_SERVICE_URL=http://localhost:5005
+APPOINTMENT_NOTIFICATION_CHANNELS=email,sms
+
+# Docker Compose: PATIENT_SERVICE_URL=http://patient-service:3001
+# Docker Compose: NOTIFICATION_SERVICE_URL=http://notification-service:5005
+# Kubernetes:     PATIENT_SERVICE_URL=http://patient-service:3001
+# Kubernetes:     NOTIFICATION_SERVICE_URL=http://notification-service:5005
 ```
 
 ### Environment Variable Summary
@@ -131,6 +139,9 @@ JWT_SECRET=your_strong_jwt_secret_here   # Must be identical to Patient Service 
 | `CLOUD_API_KEY` | Patient | Cloudinary API key |
 | `CLOUD_API_SECRET` | Patient | Cloudinary API secret |
 | `APPOINTMENT_SERVICE_URL` | Patient | URL for inter-service HTTP calls |
+| `PATIENT_SERVICE_URL` | Appointment | URL for patient profile lookup during appointment booking |
+| `NOTIFICATION_SERVICE_URL` | Appointment | URL to send appointment-created notifications |
+| `APPOINTMENT_NOTIFICATION_CHANNELS` | Appointment | Comma-separated channels (`email,sms,whatsapp`) |
 
 ---
 
@@ -252,7 +263,10 @@ kubectl create secret generic patient-service-secret \
 kubectl create secret generic appointment-service-secret \
   --from-literal=PORT=3002 \
   --from-literal=MONGO_URI="<your_atlas_mongo_uri>" \
-  --from-literal=JWT_SECRET="<your_jwt_secret>"
+  --from-literal=JWT_SECRET="<your_jwt_secret>" \
+  --from-literal=PATIENT_SERVICE_URL="http://patient-service:3001" \
+  --from-literal=NOTIFICATION_SERVICE_URL="http://notification-service:5005" \
+  --from-literal=APPOINTMENT_NOTIFICATION_CHANNELS="email,sms"
 
 kubectl get secrets
 ```

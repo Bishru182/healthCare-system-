@@ -1,7 +1,7 @@
 # 🔔 Notification Service
 
-> Microservice responsible for dispatching **email** and **SMS** notifications for the **Healthcare Distributed Platform**.
-> Built with **Node.js · Express · MongoDB (Mongoose) · Nodemailer · Twilio** using ES Modules and clean architecture.
+> Microservice responsible for dispatching **email**, **SMS**, and **WhatsApp** notifications for the **Healthcare Distributed Platform**.
+> Built with **Node.js · Express · MongoDB (Mongoose) · Nodemailer · Text.lk · Twilio** using ES Modules and clean architecture.
 
 ---
 
@@ -13,7 +13,8 @@ notification-service/
 │   ├── config/
 │   │   ├── db.js                          # MongoDB connection
 │   │   ├── mailer.js                      # Nodemailer Gmail transport
-│   │   └── twilio.js                      # Twilio SMS client
+│   │   ├── textlk.js                      # Text.lk SMS client
+│   │   └── twilio.js                      # Twilio WhatsApp client
 │   ├── controllers/
 │   │   └── notificationController.js      # Request/response layer
 │   ├── models/
@@ -54,10 +55,28 @@ cp .env.example .env
 | `MONGO_URI`    | `mongodb://localhost:27021/notification` | MongoDB connection string              |
 | `EMAIL_USER`   | —                                    | Gmail address for sending emails          |
 | `EMAIL_PASS`   | —                                    | Gmail App Password (not regular password) |
-| `TWILIO_SID`   | —                                    | Twilio Account SID                        |
-| `TWILIO_AUTH`  | —                                    | Twilio Auth Token                         |
-| `TWILIO_PHONE` | —                                    | Twilio phone number (E.164 format)        |
-| `TWILIO_WHATSAPP_FROM` | —                             | Optional WhatsApp sender (`whatsapp:+...`), falls back to `TWILIO_PHONE` |
+| `TEXTLK_API_TOKEN` | —                                | Text.lk API token from Dashboard → Developers |
+| `TEXTLK_SENDER_ID` | `TextLKDemo`                     | Approved Text.lk sender ID or number      |
+| `TEXTLK_SMS_API_URL` | `https://app.text.lk/api/v3/sms/send` | Text.lk OAuth SMS endpoint          |
+| `TEXTLK_SMS_TYPE` | `plain`                           | SMS type for Text.lk API                  |
+| `TWILIO_SID`   | —                                    | Twilio Account SID (for WhatsApp)         |
+| `TWILIO_AUTH`  | —                                    | Twilio Auth Token (for WhatsApp)          |
+| `TWILIO_PHONE` | —                                    | Twilio phone number fallback               |
+| `TWILIO_WHATSAPP_FROM` | —                             | WhatsApp sender (`whatsapp:+...`)         |
+
+### Text.lk Setup (No Monthly Fee)
+
+1. Create a free Text.lk account: https://app.text.lk/
+2. Go to **Developers** in the dashboard.
+3. Copy your **API Token**.
+4. Add to `.env`:
+  - `TEXTLK_API_TOKEN=<your_token>`
+  - `TEXTLK_SENDER_ID=<your_sender_id_or_number>`
+
+Notes:
+
+- Text.lk supports free onboarding, but SMS sends consume credits.
+- Start credits/trials and pay-as-you-go pricing are managed in your Text.lk dashboard.
 
 ---
 
@@ -111,6 +130,9 @@ kubectl get pods -l app=notification-service
 
 ### `POST /api/notifications/send`
 Dispatch email, SMS, and/or WhatsApp notifications. Returns **200 immediately** (fire-and-forget processing).
+
+- `sms` channel uses **Text.lk API**.
+- `whatsapp` channel uses **Twilio WhatsApp**.
 
 **Request body:**
 ```json
@@ -211,7 +233,7 @@ curl -X POST http://localhost:5005/api/notifications/send \
   -H "Content-Type: application/json" \
   -d '{
     "eventType": "APPOINTMENT_BOOKED",
-    "channels": ["email", "whatsapp"],
+    "channels": ["email", "sms", "whatsapp"],
     "recipients": [{"name": "Test", "email": "test@example.com", "phone": "+94771234567"}],
     "data": {"doctorName": "Silva", "date": "2026-04-20", "time": "10:00 AM"}
   }'

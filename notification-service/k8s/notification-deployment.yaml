@@ -54,6 +54,26 @@ spec:
             secretKeyRef:
               name: notification-secrets
               key: EMAIL_PASS
+        - name: TEXTLK_API_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: notification-secrets
+              key: TEXTLK_API_TOKEN
+        - name: TEXTLK_SENDER_ID
+          valueFrom:
+            secretKeyRef:
+              name: notification-secrets
+              key: TEXTLK_SENDER_ID
+        - name: TEXTLK_SMS_API_URL
+          valueFrom:
+            secretKeyRef:
+              name: notification-secrets
+              key: TEXTLK_SMS_API_URL
+        - name: TEXTLK_SMS_TYPE
+          valueFrom:
+            secretKeyRef:
+              name: notification-secrets
+              key: TEXTLK_SMS_TYPE
         - name: TWILIO_SID
           valueFrom:
             secretKeyRef:
