@@ -16,6 +16,9 @@ import AppointmentsPage     from './pages/patient/AppointmentsPage'
 import HistoryPage          from './pages/patient/HistoryPage'
 import PrescriptionsPage    from './pages/patient/PrescriptionsPage'
 import DoctorsListPage      from './pages/patient/DoctorsListPage'
+import PaymentHistory       from './pages/patient/PaymentHistory'
+import MakePayment          from './pages/patient/MakePayment'
+import PaymentDetails       from './pages/patient/PaymentDetails'
 
 // Doctor pages
 import DoctorDashboardPage     from './pages/doctor/DoctorDashboardPage'
@@ -30,6 +33,8 @@ import VideoRoomPage    from './pages/telemedicine/VideoRoomPage'
 
 // Admin pages
 import NotificationLogsPage from './pages/admin/NotificationLogsPage'
+import AdminPayments        from './pages/admin/AdminPayments'
+import AdminPaymentDetails  from './pages/admin/AdminPaymentDetails'
 
 export default function App() {
   return (
@@ -54,6 +59,9 @@ export default function App() {
                 <Route path="/patient/consultations/:id"    element={<VideoRoomPage />} />
                 <Route path="/patient/history"              element={<HistoryPage />} />
                 <Route path="/patient/prescriptions"        element={<PrescriptionsPage />} />
+                <Route path="/patient/payments"             element={<PaymentHistory />} />
+                <Route path="/patient/payments/make"        element={<MakePayment />} />
+                <Route path="/patient/payments/:id"         element={<PaymentDetails />} />
               </Route>
             </Route>
 
@@ -74,6 +82,8 @@ export default function App() {
             <Route element={<PrivateRoute role="admin" />}>
               <Route element={<DashboardLayout />}>
                 <Route path="/admin/notifications"        element={<NotificationLogsPage />} />
+                <Route path="/admin/payments"             element={<AdminPayments />} />
+                <Route path="/admin/payments/:id"         element={<AdminPaymentDetails />} />
               </Route>
             </Route>
 

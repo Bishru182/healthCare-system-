@@ -24,22 +24,23 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (selectedRole === 'admin') {
-      toast.info('Admin portal is coming soon.')
+    if (selectedRole === 'doctor') {
+      toast.info('Doctor portal is coming soon.')
       return
     }
     setLoading(true)
     try {
-      if (selectedRole === 'patient') {
-        const { data } = await authService.login({ email, password })
-        login(data.patient, 'patient', data.token)
-        toast.success(`Welcome back, ${data.patient.name}!`)
-        navigate('/patient/dashboard')
+      const { data } = await authService.login({ email, password })
+      // Use the role from the response
+      const userRole = data.patient.role || selectedRole
+      login(data.patient, userRole, data.token)
+      toast.success(`Welcome back, ${data.patient.name}!`)
+      
+      // Navigate based on role
+      if (userRole === 'admin') {
+        navigate('/admin/payments')
       } else {
-        const { data } = await doctorAuthService.login({ email, password })
-        login(data.doctor, 'doctor', data.token)
-        toast.success(`Welcome back, Dr. ${data.doctor.name}!`)
-        navigate('/doctor/dashboard')
+        navigate('/patient/dashboard')
       }
     } catch (err) {
       const msg = err.response?.data?.message || 'Login failed. Please try again.'
@@ -87,11 +88,11 @@ export default function LoginPage() {
             ))}
           </div>
 
-          {selectedRole === 'admin' ? (
+          {selectedRole === 'doctor' ? (
             <div className="placeholder-notice">
               <span className="placeholder-icon">🚧</span>
-              <p><strong>Admin Portal</strong> is coming soon.</p>
-              <p>Currently Patient and Doctor login are available.</p>
+              <p><strong>Doctor Portal</strong> is coming soon.</p>
+              <p>Currently Patient and Admin login are available.</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="auth-form">

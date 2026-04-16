@@ -58,7 +58,7 @@ const paymentSchema = new mongoose.Schema(
         values: Object.values(PAYMENT_METHOD),
         message: `paymentMethod must be one of: ${Object.values(PAYMENT_METHOD).join(', ')}`,
       },
-      default: PAYMENT_METHOD.MOCK,
+      default: PAYMENT_METHOD.CREDIT_CARD,
     },
 
     // Unique ID returned by the payment gateway on success

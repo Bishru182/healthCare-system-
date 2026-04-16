@@ -10,9 +10,10 @@ export const PAYMENT_STATUS = Object.freeze({
 });
 
 export const PAYMENT_METHOD = Object.freeze({
-  CARD: 'card',
-  MOCK: 'mock',
-  PAYHERE: 'payhere',
+  CREDIT_CARD: 'credit_card',
+  DEBIT_CARD: 'debit_card',
+  BANK_TRANSFER: 'bank_transfer',
+  DIGITAL_WALLET: 'digital_wallet',
 });
 
 export const PAYMENT_PROVIDER = Object.freeze({
