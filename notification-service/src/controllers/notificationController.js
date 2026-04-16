@@ -7,7 +7,8 @@
 
 import NotificationLog from '../models/NotificationLog.js';
 import sendEmail       from '../config/mailer.js';
-import sendSMS, { sendWhatsApp } from '../config/twilio.js';
+import sendSMS         from '../config/textlk.js';
+import { sendWhatsApp } from '../config/twilio.js';
 import getTemplate     from '../services/templateService.js';
 
 // ─────────────────────────────────────────────

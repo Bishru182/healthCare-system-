@@ -1,5 +1,11 @@
 import Doctor, { SPECIALTIES } from "../models/Doctor.js";
 
+const hasValidInternalApiKey = (req) => {
+  const expected = process.env.INTER_SERVICE_API_KEY;
+  const provided = req.headers["x-internal-api-key"];
+  return Boolean(expected) && typeof provided === "string" && provided === expected;
+};
+
 /**
  * @route GET /api/doctors/specialties
  * Returns list of supported specialties (public).
@@ -127,6 +133,35 @@ export const getDoctorById = async (req, res, next) => {
         .json({ success: false, message: "Doctor not found." });
     }
     res.status(200).json({ success: true, doctor });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @route GET /api/doctors/internal/:id/contact
+ * Trusted internal route for inter-service notifications.
+ */
+export const getInternalDoctorContact = async (req, res, next) => {
+  try {
+    if (!hasValidInternalApiKey(req)) {
+      return res.status(401).json({ success: false, message: "Unauthorized internal request." });
+    }
+
+    const doctor = await Doctor.findById(req.params.id).select("name email phone");
+    if (!doctor) {
+      return res.status(404).json({ success: false, message: "Doctor not found." });
+    }
+
+    return res.status(200).json({
+      success: true,
+      doctor: {
+        id: doctor._id,
+        name: doctor.name,
+        email: doctor.email,
+        phone: doctor.phone,
+      },
+    });
   } catch (error) {
     next(error);
   }

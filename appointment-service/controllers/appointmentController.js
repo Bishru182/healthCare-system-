@@ -1,4 +1,8 @@
 import Appointment from "../models/Appointment.js";
+import {
+  queueAppointmentBookedNotification,
+  queueConsultationCompletedNotification,
+} from "../services/notificationIntegrationService.js";
 
 // ──── Helper: normalize a Date to midnight UTC (strips time) ────
 const toDateOnly = (value) => {
@@ -38,6 +42,11 @@ export const createAppointment = async (req, res, next) => {
       time,
       reason,
       status: "pending",
+    });
+
+    // Trigger inter-service notification over HTTP without blocking appointment creation.
+    void queueAppointmentBookedNotification({
+      appointment,
     });
 
     res.status(201).json({
@@ -245,6 +254,11 @@ export const updateAppointmentStatus = async (req, res, next) => {
 
     appointment.status = status;
     await appointment.save();
+
+    if (status === "completed") {
+      // Notify both patient and doctor when consultation is completed.
+      void queueConsultationCompletedNotification({ appointment });
+    }
 
     res.status(200).json({
       success: true,

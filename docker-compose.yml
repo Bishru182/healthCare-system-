@@ -19,6 +19,7 @@ services:
       CLOUD_NAME: ${CLOUD_NAME:-dus7bhnd3}
       CLOUD_API_KEY: ${CLOUD_API_KEY:-551137298448198}
       CLOUD_API_SECRET: ${CLOUD_API_SECRET:-naoKz3ikK05AvrclUHOi3kBM5zw}
+      INTER_SERVICE_API_KEY: ${INTER_SERVICE_API_KEY:-medico-internal-key-change-me}
     networks:
       - healthcare-net
     depends_on:
@@ -41,6 +42,12 @@ services:
       CORS_ORIGINS: http://localhost:5173,http://localhost:4173,http://localhost:30173,http://127.0.0.1:5173,http://127.0.0.1:30173
       JWT_SECRET: medico-shared-jwt-secret-change-in-prod
       MONGO_URI: mongodb://mongo-appointment:27017/appointment
+      PATIENT_SERVICE_URL: http://patient-service:3001
+      NOTIFICATION_SERVICE_URL: http://notification-service:5005
+      DOCTOR_SERVICE_URL: http://doctor-service:3004
+      APPOINTMENT_NOTIFICATION_CHANNELS: ${APPOINTMENT_NOTIFICATION_CHANNELS:-email,sms}
+      CONSULTATION_NOTIFICATION_CHANNELS: ${CONSULTATION_NOTIFICATION_CHANNELS:-email,sms}
+      INTER_SERVICE_API_KEY: ${INTER_SERVICE_API_KEY:-medico-internal-key-change-me}
     networks:
       - healthcare-net
     depends_on:
@@ -85,6 +92,7 @@ services:
       JWT_SECRET: medico-shared-jwt-secret-change-in-prod
       MONGO_URI: mongodb://mongo-doctor:27017/doctor
       APPOINTMENT_SERVICE_URL: http://appointment-service:3002
+      INTER_SERVICE_API_KEY: ${INTER_SERVICE_API_KEY:-medico-internal-key-change-me}
     networks:
       - healthcare-net
     depends_on:
@@ -231,6 +239,10 @@ services:
       MONGO_URI: mongodb://mongo-notification:27017/notification
       EMAIL_USER: ${EMAIL_USER:-}
       EMAIL_PASS: ${EMAIL_PASS:-}
+      TEXTLK_API_TOKEN: ${TEXTLK_API_TOKEN:-}
+      TEXTLK_SENDER_ID: ${TEXTLK_SENDER_ID:-TextLKDemo}
+      TEXTLK_SMS_API_URL: ${TEXTLK_SMS_API_URL:-https://app.text.lk/api/v3/sms/send}
+      TEXTLK_SMS_TYPE: ${TEXTLK_SMS_TYPE:-plain}
       TWILIO_SID: ${TWILIO_SID:-}
       TWILIO_AUTH: ${TWILIO_AUTH:-}
       TWILIO_PHONE: ${TWILIO_PHONE:-}
