@@ -17,6 +17,7 @@ services:
       MONGO_URI: mongodb://mongo-patient:27017/patient
       APPOINTMENT_SERVICE_URL: http://appointment-service:3002
       DOCTOR_SERVICE_URL: http://doctor-service:3004
+      INTER_SERVICE_API_KEY: ${INTER_SERVICE_API_KEY:-medico-internal-key-change-me}
     networks:
       - healthcare-net
     depends_on:
@@ -38,6 +39,12 @@ services:
       NODE_ENV: development
       JWT_SECRET: medico-shared-jwt-secret-change-in-prod
       MONGO_URI: mongodb://mongo-appointment:27017/appointment
+      PATIENT_SERVICE_URL: http://patient-service:3001
+      NOTIFICATION_SERVICE_URL: http://notification-service:5005
+      DOCTOR_SERVICE_URL: http://doctor-service:3004
+      APPOINTMENT_NOTIFICATION_CHANNELS: ${APPOINTMENT_NOTIFICATION_CHANNELS:-email,sms}
+      CONSULTATION_NOTIFICATION_CHANNELS: ${CONSULTATION_NOTIFICATION_CHANNELS:-email,sms}
+      INTER_SERVICE_API_KEY: ${INTER_SERVICE_API_KEY:-medico-internal-key-change-me}
     networks:
       - healthcare-net
     depends_on:
@@ -80,6 +87,7 @@ services:
       JWT_SECRET: medico-shared-jwt-secret-change-in-prod
       MONGO_URI: mongodb://mongo-doctor:27017/doctor
       APPOINTMENT_SERVICE_URL: http://appointment-service:3002
+      INTER_SERVICE_API_KEY: ${INTER_SERVICE_API_KEY:-medico-internal-key-change-me}
     networks:
       - healthcare-net
     depends_on:

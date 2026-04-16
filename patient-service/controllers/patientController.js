@@ -2,6 +2,41 @@ import Patient from "../models/Patient.js";
 import Report from "../models/Report.js";
 import { cloudinary } from "../config/cloudinary.js";
 
+const hasValidInternalApiKey = (req) => {
+  const expected = process.env.INTER_SERVICE_API_KEY;
+  const provided = req.headers["x-internal-api-key"];
+  return Boolean(expected) && typeof provided === "string" && provided === expected;
+};
+
+/**
+ * @desc    Get patient contact details for trusted internal services
+ * @route   GET /api/patients/internal/:id/contact
+ */
+export const getInternalPatientContact = async (req, res, next) => {
+  try {
+    if (!hasValidInternalApiKey(req)) {
+      return res.status(401).json({ success: false, message: "Unauthorized internal request." });
+    }
+
+    const patient = await Patient.findById(req.params.id).select("name email phone");
+    if (!patient) {
+      return res.status(404).json({ success: false, message: "Patient not found." });
+    }
+
+    return res.status(200).json({
+      success: true,
+      patient: {
+        id: patient._id,
+        name: patient.name,
+        email: patient.email,
+        phone: patient.phone,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 /**
  * @desc    Get logged-in patient profile
  * @route   GET /api/patients/me

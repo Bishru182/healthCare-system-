@@ -16,6 +16,7 @@ import {
   updateMe,
   deleteMe,
   getDoctorById,
+  getInternalDoctorContact,
   verifyDoctor,
 } from "../controllers/doctorController.js";
 
@@ -107,6 +108,7 @@ router.put(
 router.put("/:id/verify", auth, roleCheck("admin"), verifyDoctor);
 
 // ───────── Public doctor detail (keep last to avoid shadowing) ─────────
+router.get("/internal/:id/contact", getInternalDoctorContact);
 router.get("/:id", getDoctorById);
 router.get("/:id/availability", getDoctorAvailability);
 

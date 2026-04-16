@@ -16,6 +16,7 @@ import {
   getProfile,
   updateProfile,
   deleteAccount,
+  getInternalPatientContact,
 } from "../controllers/patientController.js";
 
 import {
@@ -37,6 +38,7 @@ router.post("/register", registerRules, register);
 router.post("/login", loginRules, login);
 
 // ──── Patient Profile (protected) ────
+router.get("/internal/:id/contact", getInternalPatientContact);
 router.get("/me", auth, getProfile);
 router.put("/me", auth, updateProfile);
 router.delete("/me", auth, deleteAccount);
