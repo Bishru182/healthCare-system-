@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { authService } from '../../services/patientService'
+import { doctorAuthService } from '../../services/doctorService'
 import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
 import Spinner from '../../components/Spinner'
@@ -23,16 +24,23 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (selectedRole !== 'patient') {
-      toast.info('Doctor & Admin portals are coming soon.')
+    if (selectedRole === 'admin') {
+      toast.info('Admin portal is coming soon.')
       return
     }
     setLoading(true)
     try {
-      const { data } = await authService.login({ email, password })
-      login(data.patient, 'patient', data.token)
-      toast.success(`Welcome back, ${data.patient.name}!`)
-      navigate('/patient/dashboard')
+      if (selectedRole === 'patient') {
+        const { data } = await authService.login({ email, password })
+        login(data.patient, 'patient', data.token)
+        toast.success(`Welcome back, ${data.patient.name}!`)
+        navigate('/patient/dashboard')
+      } else {
+        const { data } = await doctorAuthService.login({ email, password })
+        login(data.doctor, 'doctor', data.token)
+        toast.success(`Welcome back, Dr. ${data.doctor.name}!`)
+        navigate('/doctor/dashboard')
+      }
     } catch (err) {
       const msg = err.response?.data?.message || 'Login failed. Please try again.'
       toast.error(msg)
@@ -51,7 +59,7 @@ export default function LoginPage() {
         <h1 className="auth-headline">Your Health,<br />Our Priority.</h1>
         <p className="auth-subline">Smart healthcare management for patients, doctors, and administrators — all in one platform.</p>
         <div className="auth-features">
-          {['Book appointments instantly', 'Manage your medical records', 'Track prescriptions & history'].map((f) => (
+          {['Book appointments instantly', 'Video consultations with doctors', 'Digital prescriptions & records'].map((f) => (
             <div key={f} className="auth-feature-item">
               <span className="auth-feature-check">✓</span>
               <span>{f}</span>
@@ -65,7 +73,6 @@ export default function LoginPage() {
           <h2 className="auth-card-title">Sign In</h2>
           <p className="auth-card-sub">Select your role to continue</p>
 
-          {/* Role Selector */}
           <div className="role-grid">
             {ROLES.map((r) => (
               <button
@@ -80,11 +87,11 @@ export default function LoginPage() {
             ))}
           </div>
 
-          {selectedRole !== 'patient' ? (
+          {selectedRole === 'admin' ? (
             <div className="placeholder-notice">
               <span className="placeholder-icon">🚧</span>
-              <p><strong>{selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)} Portal</strong> is coming soon.</p>
-              <p>Currently only Patient login is available.</p>
+              <p><strong>Admin Portal</strong> is coming soon.</p>
+              <p>Currently Patient and Doctor login are available.</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="auth-form">
@@ -117,7 +124,7 @@ export default function LoginPage() {
               </div>
 
               <button type="submit" className="btn btn-primary btn-full btn-lg" disabled={loading}>
-                {loading ? <Spinner size="sm" /> : 'Sign In'}
+                {loading ? <Spinner size="sm" /> : `Sign In as ${selectedRole === 'patient' ? 'Patient' : 'Doctor'}`}
               </button>
             </form>
           )}

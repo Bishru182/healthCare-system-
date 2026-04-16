@@ -13,11 +13,16 @@ services:
     environment:
       PORT: 3001
       NODE_ENV: development
+      JWT_SECRET: medico-shared-jwt-secret-change-in-prod
+      MONGO_URI: mongodb://mongo-patient:27017/patient
+      APPOINTMENT_SERVICE_URL: http://appointment-service:3002
+      DOCTOR_SERVICE_URL: http://doctor-service:3004
     networks:
       - healthcare-net
     depends_on:
       - appointment-service
       - payment-service
+      - doctor-service
 
   # ── Appointment Service ────────────────────────────────────────────────────
   appointment-service:
@@ -31,6 +36,8 @@ services:
     environment:
       PORT: 3002
       NODE_ENV: development
+      JWT_SECRET: medico-shared-jwt-secret-change-in-prod
+      MONGO_URI: mongodb://mongo-appointment:27017/appointment
     networks:
       - healthcare-net
     depends_on:
@@ -48,6 +55,7 @@ services:
     environment:
       PORT: 3003
       NODE_ENV: development
+      JWT_SECRET: medico-shared-jwt-secret-change-in-prod
       MONGO_URI: mongodb://mongo-payment:27017/payment
       APPOINTMENT_SERVICE_URL: http://appointment-service:3002
       PATIENT_SERVICE_URL: http://patient-service:3001
@@ -57,7 +65,64 @@ services:
       mongo-payment:
         condition: service_healthy
 
-  # ── MongoDB for Appointment Service ────────────────────────────────────────
+  # ── Doctor Management Service ──────────────────────────────────────────────
+  doctor-service:
+    build:
+      context: ./doctor-service
+      dockerfile: Dockerfile
+    container_name: doctor-service
+    restart: unless-stopped
+    ports:
+      - '3004:3004'
+    environment:
+      PORT: 3004
+      NODE_ENV: development
+      JWT_SECRET: medico-shared-jwt-secret-change-in-prod
+      MONGO_URI: mongodb://mongo-doctor:27017/doctor
+      APPOINTMENT_SERVICE_URL: http://appointment-service:3002
+    networks:
+      - healthcare-net
+    depends_on:
+      mongo-doctor:
+        condition: service_healthy
+
+  # ── Telemedicine Service ───────────────────────────────────────────────────
+  telemedicine-service:
+    build:
+      context: ./telemedicine-service
+      dockerfile: Dockerfile
+    container_name: telemedicine-service
+    restart: unless-stopped
+    ports:
+      - '3005:3005'
+    environment:
+      PORT: 3005
+      NODE_ENV: development
+      JWT_SECRET: medico-shared-jwt-secret-change-in-prod
+      MONGO_URI: mongodb://mongo-telemedicine:27017/telemedicine
+      APPOINTMENT_SERVICE_URL: http://appointment-service:3002
+      DOCTOR_SERVICE_URL: http://doctor-service:3004
+      PATIENT_SERVICE_URL: http://patient-service:3001
+      JITSI_DOMAIN: meet.jit.si
+    networks:
+      - healthcare-net
+    depends_on:
+      - mongo-telemedicine
+      - appointment-service
+
+  # ── MongoDB: Patient ───────────────────────────────────────────────────────
+  mongo-patient:
+    image: mongo:7.0
+    container_name: mongo-patient
+    restart: unless-stopped
+    ports:
+      - '27016:27017'
+    volumes:
+      - mongo_patient_data:/data/db
+    networks:
+      - healthcare-net
+
+  # ── MongoDB: Appointment ───────────────────────────────────────────────────
   mongo-appointment:
     image: mongo:7.0
     container_name: mongo-appointment
@@ -74,7 +139,7 @@ services:
       timeout: 5s
       retries: 5
 
-  # ── MongoDB for Payment Service ────────────────────────────────────────────
+  # ── MongoDB: Payment ───────────────────────────────────────────────────────
   mongo-payment:
     image: mongo:7.0
     container_name: mongo-payment
@@ -91,10 +156,42 @@ services:
       timeout: 5s
       retries: 5
 
+  # ── MongoDB: Doctor ────────────────────────────────────────────────────────
+  mongo-doctor:
+    image: mongo:7.0
+    container_name: mongo-doctor
+    restart: unless-stopped
+    ports:
+      - '27019:27017'
+    volumes:
+      - mongo_doctor_data:/data/db
+    networks:
+      - healthcare-net
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── MongoDB: Telemedicine ──────────────────────────────────────────────────
+  mongo-telemedicine:
+    image: mongo:7.0
+    container_name: mongo-telemedicine
+    restart: unless-stopped
+    ports:
+      - '27020:27017'
+    volumes:
+      - mongo_telemedicine_data:/data/db
+    networks:
+      - healthcare-net
+
 networks:
   healthcare-net:
     driver: bridge
 
 volumes:
+  mongo_patient_data:
   mongo_appointment_data:
   mongo_payment_data:
+  mongo_doctor_data:
+  mongo_telemedicine_data:

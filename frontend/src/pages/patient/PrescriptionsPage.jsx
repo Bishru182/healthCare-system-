@@ -35,46 +35,45 @@ export default function PrescriptionsPage() {
         <EmptyState
           icon="💊"
           title="No prescriptions on record"
-          description="Your prescriptions will appear here after your appointments."
+          message="Prescriptions issued by your doctors will appear here."
         />
       ) : (
-        <>
-          <div className="rx-grid">
-            {prescriptions.map((p) => (
-              <div key={p.id} className="rx-card card">
-                <div className="rx-header">
-                  <div className="rx-icon">💊</div>
-                  <div>
-                    <h3 className="rx-med">{p.medication}</h3>
-                    <p className="rx-doc">Prescribed by {p.prescribedBy}</p>
-                  </div>
-                </div>
-                <div className="rx-body">
-                  <div className="rx-row">
-                    <span className="rx-label">Dosage</span>
-                    <span className="rx-value">{p.dosage}</span>
-                  </div>
-                  <div className="rx-row">
-                    <span className="rx-label">Duration</span>
-                    <span className="rx-value">{p.duration}</span>
-                  </div>
-                  <div className="rx-row">
-                    <span className="rx-label">Date</span>
-                    <span className="rx-value">{formatDate(p.date)}</span>
-                  </div>
-                </div>
-                <div className="rx-footer">
-                  <span className="badge badge-confirmed">Active</span>
+        <div className="rx-grid">
+          {prescriptions.map((p) => (
+            <div key={p._id || p.id} className="rx-card card">
+              <div className="rx-header">
+                <div className="rx-icon">💊</div>
+                <div>
+                  <h3 className="rx-med">{p.diagnosis || 'Prescription'}</h3>
+                  <p className="rx-doc">Issued by Dr. {p.doctorName}</p>
                 </div>
               </div>
-            ))}
-          </div>
-
-          <div className="rx-notice">
-            <span>ℹ️</span>
-            <p>Currently showing mock prescription data. Real data will be available after Doctor Service integration.</p>
-          </div>
-        </>
+              <div className="rx-body">
+                {(p.medications || []).map((m, i) => (
+                  <div key={i} className="rx-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 2 }}>
+                    <span className="rx-label">{m.name} — {m.dosage}</span>
+                    <span className="rx-value" style={{ fontSize: '0.85rem', color: '#475569' }}>
+                      {m.frequency} · for {m.duration}{m.instructions ? ` · ${m.instructions}` : ''}
+                    </span>
+                  </div>
+                ))}
+                <div className="rx-row" style={{ marginTop: 6 }}>
+                  <span className="rx-label">Date</span>
+                  <span className="rx-value">{formatDate(p.issuedDate || p.createdAt)}</span>
+                </div>
+                {p.notes && (
+                  <div className="rx-row" style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+                    <span className="rx-label">Notes</span>
+                    <span className="rx-value" style={{ fontSize: '0.85rem' }}>{p.notes}</span>
+                  </div>
+                )}
+              </div>
+              <div className="rx-footer">
+                <span className="badge badge-confirmed">Active</span>
+              </div>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   )

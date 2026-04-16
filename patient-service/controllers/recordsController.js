@@ -1,6 +1,7 @@
 import axios from "axios";
 
 const APPOINTMENT_SERVICE_URL = process.env.APPOINTMENT_SERVICE_URL;
+const DOCTOR_SERVICE_URL = process.env.DOCTOR_SERVICE_URL;
 
 /**
  * @desc    Get patient appointment history via Appointment Service
@@ -22,9 +23,8 @@ export const getHistory = async (req, res, _next) => {
     const response = await axios.get(
       `${APPOINTMENT_SERVICE_URL}/api/appointments/patient/${patientId}`,
       {
-        headers: {
-          Authorization: authHeader,
-        },
+        headers: { Authorization: authHeader },
+        timeout: 5000,
       }
     );
 
@@ -34,7 +34,7 @@ export const getHistory = async (req, res, _next) => {
     const errorData = error.response?.data || {};
 
     console.error(
-      `[PatientService] Failed to fetch history from Appointment Service: ${error.message}`,
+      `[PatientService] Failed to fetch history: ${error.message}`,
       { status, patientId: req.patient?._id }
     );
 
@@ -46,33 +46,43 @@ export const getHistory = async (req, res, _next) => {
 };
 
 /**
- * @desc    Get prescriptions (mock / placeholder)
+ * @desc    Get prescriptions from Doctor Service
  * @route   GET /api/patients/prescriptions
  */
-export const getPrescriptions = async (_req, res, _next) => {
-  const mockPrescriptions = [
-    {
-      id: 1,
-      date: "2025-01-15",
-      medication: "Amoxicillin 500mg",
-      dosage: "1 tablet 3 times a day",
-      duration: "7 days",
-      prescribedBy: "Dr. Smith",
-    },
-    {
-      id: 2,
-      date: "2025-03-22",
-      medication: "Ibuprofen 400mg",
-      dosage: "1 tablet twice a day after meals",
-      duration: "5 days",
-      prescribedBy: "Dr. Patel",
-    },
-  ];
+export const getPrescriptions = async (req, res, _next) => {
+  try {
+    const patientId = req.patient._id;
+    const authHeader = req.headers.authorization;
 
-  res.status(200).json({
-    success: true,
-    message: "Mock prescriptions. Will be replaced by inter-service calls.",
-    count: mockPrescriptions.length,
-    prescriptions: mockPrescriptions,
-  });
+    if (!DOCTOR_SERVICE_URL) {
+      return res.status(200).json({
+        success: true,
+        count: 0,
+        prescriptions: [],
+        message: "Doctor Service URL not configured.",
+      });
+    }
+
+    const response = await axios.get(
+      `${DOCTOR_SERVICE_URL}/api/doctors/prescriptions/patient/${patientId}`,
+      {
+        headers: { Authorization: authHeader },
+        timeout: 5000,
+      }
+    );
+
+    return res.status(response.status).json(response.data);
+  } catch (error) {
+    const status = error.response?.status || 500;
+    const errorData = error.response?.data || {};
+
+    console.error(
+      `[PatientService] Failed to fetch prescriptions: ${error.message}`
+    );
+
+    return res.status(status).json({
+      success: false,
+      message: errorData.message || "Failed to retrieve prescriptions.",
+    });
+  }
 };

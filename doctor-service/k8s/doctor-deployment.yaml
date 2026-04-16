@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: doctor-service
+  labels:
+    app: doctor-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: doctor-service
+  template:
+    metadata:
+      labels:
+        app: doctor-service
+    spec:
+      containers:
+        - name: doctor-service
+          image: doctor-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3004
+          env:
+            - name: PORT
+              value: "3004"
+            - name: NODE_ENV
+              value: production
+            - name: MONGO_URI
+              value: mongodb://mongo-doctor:27017/doctor
+            - name: JWT_SECRET
+              value: medico-shared-jwt-secret-change-in-prod
+            - name: APPOINTMENT_SERVICE_URL
+              value: http://appointment-service:3002
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: doctor-service
+spec:
+  type: NodePort
+  selector:
+    app: doctor-service
+  ports:
+    - port: 3004
+      targetPort: 3004
+      nodePort: 30995
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-doctor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo-doctor
+  template:
+    metadata:
+      labels:
+        app: mongo-doctor
+    spec:
+      containers:
+        - name: mongo
+          image: mongo:7.0
+          ports:
+            - containerPort: 27017
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-doctor
+spec:
+  selector:
+    app: mongo-doctor
+  ports:
+    - port: 27017
+      targetPort: 27017

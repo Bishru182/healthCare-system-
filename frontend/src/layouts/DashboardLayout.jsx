@@ -5,21 +5,38 @@ import { useToast } from '../context/ToastContext'
 import ConfirmModal from '../components/ConfirmModal'
 import './DashboardLayout.css'
 
-const navItems = [
+const patientNav = [
   { to: '/patient/dashboard',     label: 'Dashboard',       icon: '⚡' },
   { to: '/patient/profile',       label: 'My Profile',      icon: '👤' },
   { to: '/patient/reports',       label: 'Medical Reports', icon: '📋' },
   { to: '/patient/appointments',  label: 'Appointments',    icon: '📅' },
+  { to: '/patient/doctors',       label: 'Find a Doctor',   icon: '🔍' },
+  { to: '/patient/consultations', label: 'Video Consults',  icon: '🎥' },
   { to: '/patient/history',       label: 'History',         icon: '🕐' },
   { to: '/patient/prescriptions', label: 'Prescriptions',   icon: '💊' },
 ]
 
+const doctorNav = [
+  { to: '/doctor/dashboard',     label: 'Dashboard',     icon: '⚡' },
+  { to: '/doctor/profile',       label: 'My Profile',    icon: '👤' },
+  { to: '/doctor/availability',  label: 'Availability',  icon: '🗓️' },
+  { to: '/doctor/appointments',  label: 'Appointments',  icon: '📅' },
+  { to: '/doctor/consultations', label: 'Video Sessions', icon: '🎥' },
+  { to: '/doctor/prescriptions', label: 'Prescriptions', icon: '💊' },
+]
+
 export default function DashboardLayout() {
-  const { user, logout } = useAuth()
+  const { user, role, logout } = useAuth()
   const toast = useToast()
   const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [showLogoutModal, setShowLogoutModal] = useState(false)
+
+  const navItems = role === 'doctor' ? doctorNav : patientNav
+  const roleLabel = role === 'doctor' ? 'Doctor' : 'Patient'
+  const displayName = role === 'doctor'
+    ? `Dr. ${user?.name || ''}`
+    : (user?.name || 'Patient')
 
   const handleLogout = () => {
     logout()
@@ -29,12 +46,10 @@ export default function DashboardLayout() {
 
   return (
     <div className="dashboard-root">
-      {/* Mobile overlay */}
       {sidebarOpen && (
         <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
       )}
 
-      {/* ── Sidebar ── */}
       <aside className={`sidebar ${sidebarOpen ? 'sidebar-open' : ''}`}>
         <div className="sidebar-logo">
           <span className="logo-icon">⚕️</span>
@@ -42,10 +57,10 @@ export default function DashboardLayout() {
         </div>
 
         <div className="sidebar-user">
-          <div className="sidebar-avatar">{user?.name?.charAt(0).toUpperCase() || 'P'}</div>
+          <div className="sidebar-avatar">{displayName.charAt(0).toUpperCase() || 'U'}</div>
           <div>
-            <p className="sidebar-username">{user?.name || 'Patient'}</p>
-            <p className="sidebar-role">Patient</p>
+            <p className="sidebar-username">{displayName}</p>
+            <p className="sidebar-role">{roleLabel}</p>
           </div>
         </div>
 
@@ -69,9 +84,7 @@ export default function DashboardLayout() {
         </button>
       </aside>
 
-      {/* ── Main content ── */}
       <div className="dashboard-main">
-        {/* Top Navbar */}
         <header className="dashboard-navbar">
           <button
             className="navbar-hamburger"
@@ -85,11 +98,12 @@ export default function DashboardLayout() {
             <span className="navbar-brand-text">Medico</span>
           </div>
           <div className="navbar-right">
-            <span className="navbar-greeting">Hello, {user?.name?.split(' ')[0] || 'Patient'} 👋</span>
+            <span className="navbar-greeting">
+              Hello, {displayName.split(' ')[0] || 'there'} 👋
+            </span>
           </div>
         </header>
 
-        {/* Page content */}
         <main className="dashboard-content">
           <Outlet />
         </main>
