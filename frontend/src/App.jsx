@@ -15,6 +15,13 @@ import ReportsPage          from './pages/patient/ReportsPage'
 import AppointmentsPage     from './pages/patient/AppointmentsPage'
 import HistoryPage          from './pages/patient/HistoryPage'
 import PrescriptionsPage    from './pages/patient/PrescriptionsPage'
+import PaymentHistory       from './pages/patient/PaymentHistory'
+import MakePayment          from './pages/patient/MakePayment'
+import PaymentDetails       from './pages/patient/PaymentDetails'
+
+// Admin pages
+import AdminPayments        from './pages/admin/AdminPayments'
+import AdminPaymentDetails  from './pages/admin/AdminPaymentDetails'
 
 export default function App() {
   return (
@@ -36,6 +43,17 @@ export default function App() {
                 <Route path="/patient/appointments"  element={<AppointmentsPage />} />
                 <Route path="/patient/history"       element={<HistoryPage />} />
                 <Route path="/patient/prescriptions" element={<PrescriptionsPage />} />
+                <Route path="/patient/payments"      element={<PaymentHistory />} />
+                <Route path="/patient/payments/make" element={<MakePayment />} />
+                <Route path="/patient/payments/:id"  element={<PaymentDetails />} />
+              </Route>
+            </Route>
+
+            {/* Protected admin routes */}
+            <Route element={<PrivateRoute role="admin" />}>
+              <Route element={<DashboardLayout />}>
+                <Route path="/admin/payments"        element={<AdminPayments />} />
+                <Route path="/admin/payments/:id"    element={<AdminPaymentDetails />} />
               </Route>
             </Route>
 

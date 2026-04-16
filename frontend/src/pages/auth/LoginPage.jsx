@@ -23,16 +23,24 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (selectedRole !== 'patient') {
-      toast.info('Doctor & Admin portals are coming soon.')
+    if (selectedRole !== 'patient' && selectedRole !== 'admin') {
+      toast.info('Doctor portal is coming soon.')
       return
     }
     setLoading(true)
     try {
       const { data } = await authService.login({ email, password })
-      login(data.patient, 'patient', data.token)
+      // Use the role from the response, or fall back to selected role
+      const userRole = data.patient.role || selectedRole
+      login(data.patient, userRole, data.token)
       toast.success(`Welcome back, ${data.patient.name}!`)
-      navigate('/patient/dashboard')
+      
+      // Navigate based on role
+      if (userRole === 'admin') {
+        navigate('/admin/payments')
+      } else {
+        navigate('/patient/dashboard')
+      }
     } catch (err) {
       const msg = err.response?.data?.message || 'Login failed. Please try again.'
       toast.error(msg)
@@ -80,11 +88,11 @@ export default function LoginPage() {
             ))}
           </div>
 
-          {selectedRole !== 'patient' ? (
+          {selectedRole !== 'patient' && selectedRole !== 'admin' ? (
             <div className="placeholder-notice">
               <span className="placeholder-icon">🚧</span>
               <p><strong>{selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)} Portal</strong> is coming soon.</p>
-              <p>Currently only Patient login is available.</p>
+              <p>Currently only Patient and Admin logins are available.</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="auth-form">

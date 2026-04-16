@@ -29,9 +29,13 @@ const attachToken = (instance) => {
 }
 
 export const patientApi = attachToken(
-  axios.create({ baseURL: 'http://localhost:31999/api/patients' })
+  axios.create({ baseURL: 'http://localhost:3002/api/patients' })
 )
 
 export const appointmentApi = attachToken(
-  axios.create({ baseURL: 'http://localhost:30994/api/appointments' })
+  axios.create({ baseURL: 'http://localhost:3001/api/appointments' })
+)
+
+export const paymentApi = attachToken(
+  axios.create({ baseURL: 'http://localhost:3003/api/payments' })
 )

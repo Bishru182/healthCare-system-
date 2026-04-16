@@ -7,6 +7,7 @@
 import { Router } from 'express';
 
 import authMiddleware from '../middleware/auth.middleware.js';
+import { roleCheck } from '../middleware/roleCheck.middleware.js';
 import {
   validate,
   createPaymentRules,
@@ -21,6 +22,7 @@ import {
   failPayment,
   getPaymentById,
   getPaymentsByPatient,
+  getAllPayments,
 } from '../controllers/payment.controller.js';
 
 const router = Router();
@@ -40,20 +42,28 @@ router.post('/create', createPaymentRules, validate, createPayment);
 // ─── POST /api/payments/confirm ──────────────────────────────────────────────
 /**
  * @route   POST /api/payments/confirm
- * @desc    Simulate successful payment – status → completed
- * @access  Private (requires JWT)
+ * @desc    Confirm payment (admin only)
+ * @access  Private – admin role required
  * @body    { paymentId }
  */
-router.post('/confirm', changeStatusRules, validate, confirmPayment);
+router.post('/confirm', changeStatusRules, validate, roleCheck('admin'), confirmPayment);
 
 // ─── POST /api/payments/fail ──────────────────────────────────────────────────
 /**
  * @route   POST /api/payments/fail
- * @desc    Simulate failed payment – status → failed
- * @access  Private (requires JWT)
+ * @desc    Fail payment (admin only)
+ * @access  Private – admin role required
  * @body    { paymentId, reason? }
  */
-router.post('/fail', failPaymentRules, validate, failPayment);
+router.post('/fail', failPaymentRules, validate, roleCheck('admin'), failPayment);
+
+// ─── GET /api/payments ────────────────────────────────────────────────────────
+/**
+ * @route   GET /api/payments
+ * @desc    Get all payments in the system (admin only)
+ * @access  Private – admin role required
+ */
+router.get('/', roleCheck('admin'), getAllPayments);
 
 // ─── GET /api/payments/patient/:patientId ────────────────────────────────────
 // NOTE: This route MUST be defined before GET /:id to avoid "patient" being

@@ -5,21 +5,29 @@ import { useToast } from '../context/ToastContext'
 import ConfirmModal from '../components/ConfirmModal'
 import './DashboardLayout.css'
 
-const navItems = [
+const patientNavItems = [
   { to: '/patient/dashboard',     label: 'Dashboard',       icon: '⚡' },
   { to: '/patient/profile',       label: 'My Profile',      icon: '👤' },
   { to: '/patient/reports',       label: 'Medical Reports', icon: '📋' },
   { to: '/patient/appointments',  label: 'Appointments',    icon: '📅' },
   { to: '/patient/history',       label: 'History',         icon: '🕐' },
   { to: '/patient/prescriptions', label: 'Prescriptions',   icon: '💊' },
+  { to: '/patient/payments',      label: 'Payments',        icon: '💳' },
+]
+
+const adminNavItems = [
+  { to: '/admin/payments',        label: 'Payment Management', icon: '💳' },
 ]
 
 export default function DashboardLayout() {
-  const { user, logout } = useAuth()
+  const { user, logout, role } = useAuth()
   const toast = useToast()
   const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [showLogoutModal, setShowLogoutModal] = useState(false)
+
+  // Select nav items based on user role
+  const navItems = role === 'admin' ? adminNavItems : patientNavItems
 
   const handleLogout = () => {
     logout()
@@ -42,10 +50,10 @@ export default function DashboardLayout() {
         </div>
 
         <div className="sidebar-user">
-          <div className="sidebar-avatar">{user?.name?.charAt(0).toUpperCase() || 'P'}</div>
+          <div className="sidebar-avatar">{user?.name?.charAt(0).toUpperCase() || 'U'}</div>
           <div>
-            <p className="sidebar-username">{user?.name || 'Patient'}</p>
-            <p className="sidebar-role">Patient</p>
+            <p className="sidebar-username">{user?.name || 'User'}</p>
+            <p className="sidebar-role">{role === 'admin' ? 'Administrator' : 'Patient'}</p>
           </div>
         </div>
 
