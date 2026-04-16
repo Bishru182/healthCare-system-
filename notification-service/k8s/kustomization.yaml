@@ -1,0 +1,21 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: default
+
+resources:
+  
+  - notification-serviceaccount.yaml
+  - notification-configmap.yaml
+  - notification-secret.yaml
+  - notification-service.yaml
+  - notification-deployment.yaml
+  - notification-hpa.yaml
+
+commonLabels:
+  app.kubernetes.io/name: notification-service
+  app.kubernetes.io/instance: healthcare
+  app.kubernetes.io/part-of: healthcare-system
+
+commonAnnotations:
+  managed-by: kustomize

@@ -28,6 +28,9 @@ import DoctorPrescriptionsPage from './pages/doctor/DoctorPrescriptionsPage'
 import SessionsListPage from './pages/telemedicine/SessionsListPage'
 import VideoRoomPage    from './pages/telemedicine/VideoRoomPage'
 
+// Admin pages
+import NotificationLogsPage from './pages/admin/NotificationLogsPage'
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -67,6 +70,13 @@ export default function App() {
               </Route>
             </Route>
 
+            {/* Protected admin routes */}
+            <Route element={<PrivateRoute role="admin" />}>
+              <Route element={<DashboardLayout />}>
+                <Route path="/admin/notifications"        element={<NotificationLogsPage />} />
+              </Route>
+            </Route>
+
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
@@ -75,3 +85,4 @@ export default function App() {
     </BrowserRouter>
   )
 }
+
