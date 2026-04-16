@@ -1,12 +1,13 @@
 import './ConfirmModal.css'
 
-export default function ConfirmModal({ isOpen, title, message, onConfirm, onCancel, confirmLabel = 'Confirm', danger = false }) {
+export default function ConfirmModal({ isOpen, title, message, onConfirm, onCancel, confirmLabel = 'Confirm', danger = false, children }) {
   if (!isOpen) return null
   return (
     <div className="modal-overlay" onClick={onCancel}>
       <div className="modal-box" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
         <h3 className="modal-title">{title}</h3>
         <p className="modal-message">{message}</p>
+        {children && <div className="modal-content">{children}</div>}
         <div className="modal-actions">
           <button className="btn btn-ghost" onClick={onCancel}>Cancel</button>
           <button

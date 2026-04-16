@@ -1,0 +1,43 @@
+/* Payment Status Component */
+
+.payment-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-icon {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.9em;
+}
+
+/* Pending – Warning */
+.payment-status.status-pending {
+  background-color: var(--warning-light);
+  color: #b45309;
+}
+
+/* Completed – Success */
+.payment-status.status-completed {
+  background-color: var(--success-light);
+  color: #065f46;
+}
+
+/* Failed – Danger */
+.payment-status.status-failed {
+  background-color: var(--danger-light);
+  color: #7f1d1d;
+}
+
+/* Unknown */
+.payment-status.status-unknown {
+  background-color: var(--bg-card);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}

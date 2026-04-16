@@ -4,8 +4,12 @@ import Patient from "../models/Patient.js";
 
 // ---------- helpers ----------
 
-const generateToken = (id) =>
-  jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+const generateToken = (user) =>
+  jwt.sign(
+    { id: user._id, email: user.email, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: "7d" }
+  );
 
 // ---------- validation rules ----------
 
@@ -49,13 +53,14 @@ export const register = async (req, res, next) => {
     res.status(201).json({
       success: true,
       message: "Patient registered successfully.",
-      token: generateToken(patient._id),
+      token: generateToken(patient),
       patient: {
         id: patient._id,
         name: patient.name,
         email: patient.email,
         age: patient.age,
         phone: patient.phone,
+        role: patient.role,
       },
     });
   } catch (error) {
@@ -93,13 +98,14 @@ export const login = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "Login successful.",
-      token: generateToken(patient._id),
+      token: generateToken(patient),
       patient: {
         id: patient._id,
         name: patient.name,
         email: patient.email,
         age: patient.age,
         phone: patient.phone,
+        role: patient.role,
       },
     });
   } catch (error) {

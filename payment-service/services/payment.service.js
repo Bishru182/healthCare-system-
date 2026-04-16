@@ -33,7 +33,7 @@ export const createPayment = async ({
   appointmentId,
   amount,
   currency = 'USD',
-  paymentMethod = 'mock',
+  paymentMethod = 'credit_card',
 }) => {
   // 1a. Validate IDs
   if (!isValidObjectId(patientId)) {
@@ -205,5 +205,20 @@ export const getPaymentsByPatient = async (patientId) => {
 
   const payments = await Payment.find({ patientId }).sort({ createdAt: -1 });
 
+  return payments;
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 6. GET ALL PAYMENTS (ADMIN ONLY)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Fetches all payments in the system, newest first.
+ * Admin only - returns all payments regardless of patient.
+ *
+ * @returns {Promise<Payment[]>}
+ */
+export const getAllPayments = async () => {
+  const payments = await Payment.find({}).sort({ createdAt: -1 });
   return payments;
 };

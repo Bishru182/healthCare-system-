@@ -146,3 +146,25 @@ export const getPaymentsByPatient = async (req, res, next) => {
     next(error);
   }
 };
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GET /api/payments
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Get all payments in the system (admin only).
+ * Returns all payments, newest first.
+ */
+export const getAllPayments = async (req, res, next) => {
+  try {
+    const payments = await paymentService.getAllPayments();
+
+    return res.status(HTTP_STATUS.OK).json({
+      success: true,
+      count: payments.length,
+      data: payments,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
