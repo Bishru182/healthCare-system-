@@ -117,57 +117,163 @@ cp appointment-service/.env.example appointment-service/.env
 ```env
 PORT=3002
 MONGO_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/medico?appName=<appName>
-JWT_SECRET=your_strong_jwt_secret_here   # Must be identical to Patient Service JWT_SECRET
+JWT_SECRET=your_strong_jwt_secret_here
 PATIENT_SERVICE_URL=http://localhost:3001
-NOTIFICATION_SERVICE_URL=http://localhost:5005
-APPOINTMENT_NOTIFICATION_CHANNELS=email,sms
-
-# Docker Compose: PATIENT_SERVICE_URL=http://patient-service:3001
-# Docker Compose: NOTIFICATION_SERVICE_URL=http://notification-service:5005
-# Kubernetes:     PATIENT_SERVICE_URL=http://patient-service:3001
-# Kubernetes:     NOTIFICATION_SERVICE_URL=http://notification-service:5005
+DOCTOR_SERVICE_URL=http://localhost:3004
 ```
 
-### Environment Variable Summary
+### Payment Service — `payment-service/.env`
 
-| Variable | Service | Description |
+```bash
+cp payment-service/.env.example payment-service/.env
+```
+
+```env
+PORT=3003
+MONGO_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/medico?appName=<appName>
+JWT_SECRET=your_strong_jwt_secret_here
+APPOINTMENT_SERVICE_URL=http://localhost:3002
+PATIENT_SERVICE_URL=http://localhost:3001
+PAYMENT_PROVIDER=stripe
+STRIPE_SECRET_KEY=sk_test_xxxxxxxxxxxx
+SUCCESS_URL=http://localhost:5173/patient/payments
+CANCEL_URL=http://localhost:5173/patient/payments
+```
+
+### Doctor Service — `doctor-service/.env`
+
+```env
+PORT=3004
+MONGO_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/medico?appName=<appName>
+JWT_SECRET=your_strong_jwt_secret_here
+NODE_ENV=development
+CORS_ORIGINS=http://localhost:5173,http://localhost:4173
+```
+
+### Telemedicine Service — `telemedicine-service/.env`
+
+```env
+PORT=3005
+MONGO_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/medico?appName=<appName>
+JWT_SECRET=your_strong_jwt_secret_here
+APPOINTMENT_SERVICE_URL=http://localhost:3002
+JITSI_DOMAIN=meet.jit.si
+CORS_ORIGINS=http://localhost:5173,http://localhost:4173
+```
+
+### Notification Service — `notification-service/.env`
+
+```env
+PORT=5005
+MONGO_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/medico?appName=<appName>
+NODE_ENV=development
+
+# Email Configuration (SMTP)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_app_password
+
+# SMS via TextLK (Optional)
+TEXTLK_API_TOKEN=your_textlk_token
+TEXTLK_SENDER_ID=MedicoHealth
+
+# SMS/WhatsApp via Twilio (Optional)
+TWILIO_SID=your_twilio_sid
+TWILIO_AUTH=your_twilio_auth_token
+TWILIO_PHONE=+1234567890
+TWILIO_WHATSAPP_FROM=whatsapp:+1234567890
+```
+
+### Environment Variables Summary
+
+| Variable | Services | Description |
 |---|---|---|
-| `PORT` | Patient, Appointment | Listening port |
-| `MONGO_URI` | Patient, Appointment | MongoDB Atlas connection string |
-| `JWT_SECRET` | Patient, Appointment | Must be identical across both services |
+| `PORT` | All | Listening port |
+| `MONGO_URI` | All | MongoDB Atlas connection string |
+| `JWT_SECRET` | Patient, Appointment, Doctor, Telemedicine | **Must be identical across services** |
+| `NODE_ENV` | Doctor, Notification | Environment (development/production) |
+| `CORS_ORIGINS` | Doctor, Telemedicine | Comma-separated allowed origins |
 | `CLOUD_NAME` | Patient | Cloudinary cloud name |
 | `CLOUD_API_KEY` | Patient | Cloudinary API key |
 | `CLOUD_API_SECRET` | Patient | Cloudinary API secret |
-| `APPOINTMENT_SERVICE_URL` | Patient | URL for inter-service HTTP calls |
-| `PATIENT_SERVICE_URL` | Appointment | URL for patient profile lookup during appointment booking |
-| `NOTIFICATION_SERVICE_URL` | Appointment | URL to send appointment-created notifications |
-| `APPOINTMENT_NOTIFICATION_CHANNELS` | Appointment | Comma-separated channels (`email,sms,whatsapp`) |
-
----
-
-## 5. Local Development Setup
-
-> **Startup order:** Appointment Service → Patient Service → Frontend
-
-### Appointment Service
-```bash
-cd appointment-service
-npm install
-cp .env.example .env   # then populate .env
-npm run dev            # → http://localhost:3002
-```
+| `APPOINTMENT_SERVICE_URL` | Patient, Telemedicine, Payment | Inter-service URL |
+| `PATIENT_SERVICE_URL` | Appointment, Payment | Inter-service URL |
+| `DOCTOR_SERVICE_URL` | Appointment | Inter-service URL |
+| `PAYMENT_PROVIDER` | Payment | `stripe`, `payhere`, or `mock` |
+| `STRIPE_SECRET_KEY` | Payment | Stripe test key (sk_test_...) |
+| `SUCCESS_URL` | Payment | Redirect after successful payment |
+| `CANCEL_URL` | Payment | Redirect after cancelled payment |
+| `JITSI_DOMAIN` | TePatient → Appointment → Doctor → Payment → Telemedicine → Notification → Frontend
 
 ### Patient Service
 ```bash
 cd patient-service
 npm install
-cp .env.example .env   # then populate .env
-npm run dev            # → http://localhost:3001
+npm start            # → http://localhost:3001
+```
+
+### Appointment Service
+```bash
+cd appointment-service
+npm install
+npm start            # → http://localhost:3002
+```
+
+### Doctor Service
+```bash
+cd doctor-service
+npm install
+npm run seed         # (Optional: populate with test doctors)
+npm start            # → http://localhost:3004
+```
+
+### Payment Service
+```bash
+cd payment-service
+npm install
+npm start            # → http://localhost:3003
+```
+
+### Telemedicine Service
+```bash
+cd telemedicine-service
+npm install
+npm start            # → http://localhost:3005
+```
+
+### Notification Service
+```bash
+cd notification-service
+npm install
+npm start            # → http://localhost:5005
 ```
 
 ### Frontend
 ```bash
-cd frontend
+docker compose logs -f doctor-service
+docker compose logs -f payment-service
+docker compose logs -f telemedicine-service
+docker compose logs -f notification-service
+
+# Stop services
+docker compose down
+
+# Stop and remove volumes
+docker compose down -v
+```
+
+**Services started by Docker Compose:**
+
+| Container | Port Mapping | Notes |
+|---|---|---|
+| `patient-service` | `3001:3001` | Uses MongoDB Atlas |
+| `appointment-service` | `3002:3002` | Uses MongoDB Atlas |
+| `payment-service` | `3003:3003` | Uses MongoDB Atlas, Stripe integration |
+| `doctor-service` | `3004:3004` | Uses MongoDB Atlas |
+| `telemedicine-service` | `3005:3005` | Uses MongoDB Atlas, Jitsi integration |
+| `notification-service` | `5005:5005` | Uses MongoDB Atlas, Email/SMS gateways |
+| `frontend` | `5173:5173` | Vite dev server with hot reload
 npm install
 npm run dev            # → http://localhost:5173
 ```
@@ -301,26 +407,38 @@ kubectl logs -f deployment/appointment-service
 All pods should reach `Running` with `1/1` containers ready.
 
 ### 7.6 Access Services (Port-Forward)
+ Notes |
+|---|---|---|
+| Patient Service | http://localhost:3001 | User registration, profile management |
+| Appointment Service | http://localhost:3002 | Appointment booking, status management |
+| Doctor Service | http://localhost:3004 | Doctor profiles, availability, specialties |
+| Payment Service | http://localhost:3003 | Payment processing with Stripe |
+| Telemedicine Service | http://localhost:3005 | Video consultations via Jitsi |
+| Notification Service | http://localhost:5005 | Email, SMS, WhatsApp notifications |
+| Frontend (Vite Dev) | http://localhost:5173 | React application with hot reload |
 
-```bash
-# Terminal 1
-kubectl port-forward service/patient-service 3001:3001
+### Docker Compose
 
-# Terminal 2
-kubectl port-forward service/appointment-service 3002:3002
-```
+| Service | URL |
+|---|---|
+| Patient Service | http://localhost:3001 |
+| Appointment Service | http://localhost:3002 |
+| Payment Service | http://localhost:3003 |
+| Doctor Service | http://localhost:3004 |
+| Telemedicine Service | http://localhost:3005 |
+| Notification Service | http://localhost:5005 |
+| Frontend | http://localhost:5173 |
 
-> Keep each port-forward command running. The connection closes if the terminal exits.
+### Kubernetes (Port-Forwarded)
 
-### 7.7 Teardown
-
-```bash
-kubectl delete -f patient-service/patient-deployment.yaml
-kubectl delete -f patient-service/patient-service.yaml
-kubectl delete -f appointment-service/appointment-deployment.yaml
-kubectl delete -f appointment-service/appointment-service.yaml
-
-kubectl delete secret patient-service-secret
+| Service | URL | K8s Service Type |
+|---|---|---|
+| Patient Service | http://localhost:3001 | NodePort |
+| Appointment Service | http://localhost:3002 | NodePort |
+| Payment Service | http://localhost:3003 | NodePort |
+| Doctor Service | http://localhost:3004 | NodePort |
+| Telemedicine Service | http://localhost:3005 | NodePort |
+| Notification Service | http://localhost:5005
 kubectl delete secret appointment-service-secret
 
 kubectl get pods     # Confirm all resources removed
