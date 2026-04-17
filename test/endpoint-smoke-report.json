@@ -1,0 +1,712 @@
+{
+  "executedAt": "2026-04-17T06:22:48.300Z",
+  "totals": {
+    "total": 77,
+    "passed": 77,
+    "failed": 0
+  },
+  "state": {
+    "patientId": "69e1d1b36d974764ab82fb23",
+    "doctorId": "69e1d1b20cc1142e2e71f60c",
+    "appointment1": "69e1d1b332fdf258f2d2a9f0",
+    "payment1": "69e1d1b41b89c4955ddafb23",
+    "sessionId": "69e1d1b5ed9979e8c47edf05",
+    "prescriptionId": "69e1d1b50cc1142e2e71f630",
+    "reportId": "69e1d1b76d974764ab82fb3c"
+  },
+  "results": [
+    {
+      "name": "frontend root",
+      "method": "GET",
+      "url": "http://localhost:5173/",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "<!DOCTYPE html>\r\n<html lang=\"en\">\r\n  <head>\r\n    <meta charset=\"UTF-8\" />\r\n    <link rel=\"icon\" type=\"image/svg+xml\" href=\"/medico-icon.svg\" />\r\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" /"
+    },
+    {
+      "name": "patient health",
+      "method": "GET",
+      "url": "http://localhost:3001/",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"service\":\"Patient Service\",\"status\":\"running\"}"
+    },
+    {
+      "name": "appointment health",
+      "method": "GET",
+      "url": "http://localhost:3002/",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"service\":\"Appointment Service\",\"status\":\"running\"}"
+    },
+    {
+      "name": "doctor health",
+      "method": "GET",
+      "url": "http://localhost:3004/",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"service\":\"Doctor Management Service\",\"status\":\"running\"}"
+    },
+    {
+      "name": "payment health",
+      "method": "GET",
+      "url": "http://localhost:3003/health",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"service\":\"payment-service\",\"status\":\"UP\",\"timestamp\":\"2026-04-17T06:22:42.657Z\",\"provider\":\"stripe\"}"
+    },
+    {
+      "name": "telemedicine health",
+      "method": "GET",
+      "url": "http://localhost:3005/",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"service\":\"Telemedicine Service\",\"status\":\"running\",\"jitsiDomain\":\"meet.jit.si\"}"
+    },
+    {
+      "name": "notification health",
+      "method": "GET",
+      "url": "http://localhost:5005/health",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"status\":\"OK\",\"service\":\"notification-service\"}"
+    },
+    {
+      "name": "doctor specialties",
+      "method": "GET",
+      "url": "http://localhost:3004/api/doctors/specialties",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"specialties\":[\"General Physician\",\"Cardiologist\",\"Dermatologist\",\"Neurologist\",\"Pediatrician\",\"Gynecologist\",\"Orthopedic\",\"Psychiatrist\",\"ENT Specialist\",\"Ophthalmologist\",\"Dentist\",\"Endocrinologist\"]}"
+    },
+    {
+      "name": "doctor register",
+      "method": "POST",
+      "url": "http://localhost:3004/api/doctors/register",
+      "expected": "201",
+      "status": 201,
+      "pass": true,
+      "summary": "{\"success\":true,\"message\":\"Doctor registered successfully. Pending admin verification.\",\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZTFkMWIyMGNjMTE0MmUyZTcxZjYwYyIsInJvbGUiOiJkb2N0b3IiLCJpYXQiOjE3NzY0MDY5Nj"
+    },
+    {
+      "name": "doctor login",
+      "method": "POST",
+      "url": "http://localhost:3004/api/doctors/login",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"message\":\"Login successful.\",\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZTFkMWIyMGNjMTE0MmUyZTcxZjYwYyIsInJvbGUiOiJkb2N0b3IiLCJpYXQiOjE3NzY0MDY5NjMsImV4cCI6MTc3NzAxMTc2M30.Z2uwoYjhnpYe1hd5"
+    },
+    {
+      "name": "doctor me",
+      "method": "GET",
+      "url": "http://localhost:3004/api/doctors/me",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"doctor\":{\"_id\":\"69e1d1b20cc1142e2e71f60c\",\"name\":\"Endpoint Test Doctor\",\"email\":\"endpoint.doctor.1776406962026.3869@test.local\",\"specialty\":\"General Physician\",\"phone\":\"+94770000001\",\"licenseNumber\":\"LIC"
+    },
+    {
+      "name": "doctor update me",
+      "method": "PUT",
+      "url": "http://localhost:3004/api/doctors/me",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"message\":\"Profile updated.\",\"doctor\":{\"_id\":\"69e1d1b20cc1142e2e71f60c\",\"name\":\"Endpoint Test Doctor\",\"email\":\"endpoint.doctor.1776406962026.3869@test.local\",\"specialty\":\"General Physician\",\"phone\":\"+9477"
+    },
+    {
+      "name": "doctor admin pending",
+      "method": "GET",
+      "url": "http://localhost:3004/api/doctors/admin/pending",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"count\":1,\"doctors\":[{\"_id\":\"69e1d1b20cc1142e2e71f60c\",\"name\":\"Endpoint Test Doctor\",\"email\":\"endpoint.doctor.1776406962026.3869@test.local\",\"specialty\":\"General Physician\",\"phone\":\"+94770000001\",\"license"
+    },
+    {
+      "name": "doctor verify",
+      "method": "PUT",
+      "url": "http://localhost:3004/api/doctors/69e1d1b20cc1142e2e71f60c/verify",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"message\":\"Doctor verified.\",\"doctor\":{\"_id\":\"69e1d1b20cc1142e2e71f60c\",\"name\":\"Endpoint Test Doctor\",\"email\":\"endpoint.doctor.1776406962026.3869@test.local\",\"specialty\":\"General Physician\",\"phone\":\"+9477"
+    },
+    {
+      "name": "doctor get by id",
+      "method": "GET",
+      "url": "http://localhost:3004/api/doctors/69e1d1b20cc1142e2e71f60c",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"doctor\":{\"_id\":\"69e1d1b20cc1142e2e71f60c\",\"name\":\"Endpoint Test Doctor\",\"email\":\"endpoint.doctor.1776406962026.3869@test.local\",\"specialty\":\"General Physician\",\"phone\":\"+94770000001\",\"licenseNumber\":\"LIC"
+    },
+    {
+      "name": "doctor public availability",
+      "method": "GET",
+      "url": "http://localhost:3004/api/doctors/69e1d1b20cc1142e2e71f60c/availability",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"count\":0,\"slots\":[]}"
+    },
+    {
+      "name": "doctor internal contact success",
+      "method": "GET",
+      "url": "http://localhost:3004/api/doctors/internal/69e1d1b20cc1142e2e71f60c/contact",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"doctor\":{\"id\":\"69e1d1b20cc1142e2e71f60c\",\"name\":\"Endpoint Test Doctor\",\"email\":\"endpoint.doctor.1776406962026.3869@test.local\",\"phone\":\"+94770000001\"}}"
+    },
+    {
+      "name": "doctor internal contact unauthorized",
+      "method": "GET",
+      "url": "http://localhost:3004/api/doctors/internal/69e1d1b20cc1142e2e71f60c/contact",
+      "expected": "401",
+      "status": 401,
+      "pass": true,
+      "summary": "{\"success\":false,\"message\":\"Unauthorized internal request.\"}"
+    },
+    {
+      "name": "doctor list public",
+      "method": "GET",
+      "url": "http://localhost:3004/api/doctors",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"count\":3,\"doctors\":[{\"_id\":\"69e1d1b20cc1142e2e71f60c\",\"name\":\"Endpoint Test Doctor\",\"email\":\"endpoint.doctor.1776406962026.3869@test.local\",\"specialty\":\"General Physician\",\"phone\":\"+94770000001\",\"license"
+    },
+    {
+      "name": "patient register",
+      "method": "POST",
+      "url": "http://localhost:3001/api/patients/register",
+      "expected": "201",
+      "status": 201,
+      "pass": true,
+      "summary": "{\"success\":true,\"message\":\"Patient registered successfully.\",\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZTFkMWIzNmQ5NzQ3NjRhYjgyZmIyMyIsImVtYWlsIjoiZW5kcG9pbnQucGF0aWVudC4xNzc2NDA2OTYyMDI2LjY4NTNAdGVzdC5sb"
+    },
+    {
+      "name": "patient login",
+      "method": "POST",
+      "url": "http://localhost:3001/api/patients/login",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"message\":\"Login successful.\",\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZTFkMWIzNmQ5NzQ3NjRhYjgyZmIyMyIsImVtYWlsIjoiZW5kcG9pbnQucGF0aWVudC4xNzc2NDA2OTYyMDI2LjY4NTNAdGVzdC5sb2NhbCIsInJvbGUi"
+    },
+    {
+      "name": "patient me",
+      "method": "GET",
+      "url": "http://localhost:3001/api/patients/me",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"patient\":{\"_id\":\"69e1d1b36d974764ab82fb23\",\"name\":\"Endpoint Test Patient\",\"email\":\"endpoint.patient.1776406962026.6853@test.local\",\"age\":30,\"phone\":\"+94770000002\",\"role\":\"patient\",\"createdAt\":\"2026-04-17"
+    },
+    {
+      "name": "patient update me",
+      "method": "PUT",
+      "url": "http://localhost:3001/api/patients/me",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"message\":\"Profile updated successfully.\",\"patient\":{\"_id\":\"69e1d1b36d974764ab82fb23\",\"name\":\"Endpoint Test Patient\",\"email\":\"endpoint.patient.1776406962026.6853@test.local\",\"age\":31,\"phone\":\"+94770009999"
+    },
+    {
+      "name": "patient internal contact success",
+      "method": "GET",
+      "url": "http://localhost:3001/api/patients/internal/69e1d1b36d974764ab82fb23/contact",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"patient\":{\"id\":\"69e1d1b36d974764ab82fb23\",\"name\":\"Endpoint Test Patient\",\"email\":\"endpoint.patient.1776406962026.6853@test.local\",\"phone\":\"+94770009999\"}}"
+    },
+    {
+      "name": "patient internal contact unauthorized",
+      "method": "GET",
+      "url": "http://localhost:3001/api/patients/internal/69e1d1b36d974764ab82fb23/contact",
+      "expected": "401",
+      "status": 401,
+      "pass": true,
+      "summary": "{\"success\":false,\"message\":\"Unauthorized internal request.\"}"
+    },
+    {
+      "name": "doctor create availability A",
+      "method": "POST",
+      "url": "http://localhost:3004/api/doctors/availability",
+      "expected": "201",
+      "status": 201,
+      "pass": true,
+      "summary": "{\"success\":true,\"slot\":{\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"dayOfWeek\":\"Monday\",\"startTime\":\"09:00\",\"endTime\":\"12:00\",\"slotDurationMinutes\":30,\"isActive\":true,\"_id\":\"69e1d1b30cc1142e2e71f617\",\"createdAt\":\"2026-04-17T0"
+    },
+    {
+      "name": "doctor create availability B",
+      "method": "POST",
+      "url": "http://localhost:3004/api/doctors/availability",
+      "expected": "201",
+      "status": 201,
+      "pass": true,
+      "summary": "{\"success\":true,\"slot\":{\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"dayOfWeek\":\"Tuesday\",\"startTime\":\"13:00\",\"endTime\":\"15:00\",\"slotDurationMinutes\":20,\"isActive\":true,\"_id\":\"69e1d1b30cc1142e2e71f619\",\"createdAt\":\"2026-04-17T"
+    },
+    {
+      "name": "doctor get my availability",
+      "method": "GET",
+      "url": "http://localhost:3004/api/doctors/availability/mine",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"count\":2,\"slots\":[{\"_id\":\"69e1d1b30cc1142e2e71f617\",\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"dayOfWeek\":\"Monday\",\"startTime\":\"09:00\",\"endTime\":\"12:00\",\"slotDurationMinutes\":30,\"isActive\":true,\"createdAt\":\""
+    },
+    {
+      "name": "doctor update availability",
+      "method": "PUT",
+      "url": "http://localhost:3004/api/doctors/availability/69e1d1b30cc1142e2e71f617",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"slot\":{\"_id\":\"69e1d1b30cc1142e2e71f617\",\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"dayOfWeek\":\"Monday\",\"startTime\":\"09:00\",\"endTime\":\"12:30\",\"slotDurationMinutes\":25,\"isActive\":true,\"createdAt\":\"2026-04-17T0"
+    },
+    {
+      "name": "doctor delete availability",
+      "method": "DELETE",
+      "url": "http://localhost:3004/api/doctors/availability/69e1d1b30cc1142e2e71f619",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"message\":\"Slot removed.\"}"
+    },
+    {
+      "name": "appointment create #1",
+      "method": "POST",
+      "url": "http://localhost:3002/api/appointments",
+      "expected": "201",
+      "status": 201,
+      "pass": true,
+      "summary": "{\"success\":true,\"message\":\"Appointment created successfully.\",\"appointment\":{\"patientId\":\"69e1d1b36d974764ab82fb23\",\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"date\":\"2026-04-18T00:00:00.000Z\",\"time\":\"10:30\",\"reason\":\"Endpoin"
+    },
+    {
+      "name": "appointment create #2",
+      "method": "POST",
+      "url": "http://localhost:3002/api/appointments",
+      "expected": "201",
+      "status": 201,
+      "pass": true,
+      "summary": "{\"success\":true,\"message\":\"Appointment created successfully.\",\"appointment\":{\"patientId\":\"69e1d1b36d974764ab82fb23\",\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"date\":\"2026-04-19T00:00:00.000Z\",\"time\":\"11:30\",\"reason\":\"Endpoin"
+    },
+    {
+      "name": "appointment create #3",
+      "method": "POST",
+      "url": "http://localhost:3002/api/appointments",
+      "expected": "201",
+      "status": 201,
+      "pass": true,
+      "summary": "{\"success\":true,\"message\":\"Appointment created successfully.\",\"appointment\":{\"patientId\":\"69e1d1b36d974764ab82fb23\",\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"date\":\"2026-04-20T00:00:00.000Z\",\"time\":\"12:30\",\"reason\":\"Endpoin"
+    },
+    {
+      "name": "appointment create #4",
+      "method": "POST",
+      "url": "http://localhost:3002/api/appointments",
+      "expected": "201",
+      "status": 201,
+      "pass": true,
+      "summary": "{\"success\":true,\"message\":\"Appointment created successfully.\",\"appointment\":{\"patientId\":\"69e1d1b36d974764ab82fb23\",\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"date\":\"2026-04-21T00:00:00.000Z\",\"time\":\"14:00\",\"reason\":\"Endpoin"
+    },
+    {
+      "name": "appointment create #5",
+      "method": "POST",
+      "url": "http://localhost:3002/api/appointments",
+      "expected": "201",
+      "status": 201,
+      "pass": true,
+      "summary": "{\"success\":true,\"message\":\"Appointment created successfully.\",\"appointment\":{\"patientId\":\"69e1d1b36d974764ab82fb23\",\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"date\":\"2026-04-22T00:00:00.000Z\",\"time\":\"15:00\",\"reason\":\"Endpoin"
+    },
+    {
+      "name": "appointment create #6",
+      "method": "POST",
+      "url": "http://localhost:3002/api/appointments",
+      "expected": "201",
+      "status": 201,
+      "pass": true,
+      "summary": "{\"success\":true,\"message\":\"Appointment created successfully.\",\"appointment\":{\"patientId\":\"69e1d1b36d974764ab82fb23\",\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"date\":\"2026-04-23T00:00:00.000Z\",\"time\":\"16:00\",\"reason\":\"Endpoin"
+    },
+    {
+      "name": "appointment get by id",
+      "method": "GET",
+      "url": "http://localhost:3002/api/appointments/69e1d1b332fdf258f2d2a9f0",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"appointment\":{\"_id\":\"69e1d1b332fdf258f2d2a9f0\",\"patientId\":\"69e1d1b36d974764ab82fb23\",\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"date\":\"2026-04-18T00:00:00.000Z\",\"time\":\"10:30\",\"reason\":\"Endpoint smoke test\""
+    },
+    {
+      "name": "appointment update",
+      "method": "PUT",
+      "url": "http://localhost:3002/api/appointments/69e1d1b332fdf258f2d2a9f0",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"message\":\"Appointment updated successfully.\",\"appointment\":{\"_id\":\"69e1d1b332fdf258f2d2a9f0\",\"patientId\":\"69e1d1b36d974764ab82fb23\",\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"date\":\"2026-04-18T00:00:00.000Z\""
+    },
+    {
+      "name": "appointment list by patient",
+      "method": "GET",
+      "url": "http://localhost:3002/api/appointments/patient/69e1d1b36d974764ab82fb23",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"count\":6,\"appointments\":[{\"_id\":\"69e1d1b332fdf258f2d2a9f0\",\"patientId\":\"69e1d1b36d974764ab82fb23\",\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"date\":\"2026-04-18T00:00:00.000Z\",\"time\":\"10:45\",\"reason\":\"Reschedu"
+    },
+    {
+      "name": "appointment list by doctor",
+      "method": "GET",
+      "url": "http://localhost:3002/api/appointments/doctor/69e1d1b20cc1142e2e71f60c",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"count\":6,\"appointments\":[{\"_id\":\"69e1d1b332fdf258f2d2a9f0\",\"patientId\":\"69e1d1b36d974764ab82fb23\",\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"date\":\"2026-04-18T00:00:00.000Z\",\"time\":\"10:45\",\"reason\":\"Reschedu"
+    },
+    {
+      "name": "doctor proxy appointments mine",
+      "method": "GET",
+      "url": "http://localhost:3004/api/doctors/appointments/mine",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"count\":6,\"appointments\":[{\"_id\":\"69e1d1b332fdf258f2d2a9f0\",\"patientId\":\"69e1d1b36d974764ab82fb23\",\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"date\":\"2026-04-18T00:00:00.000Z\",\"time\":\"10:45\",\"reason\":\"Reschedu"
+    },
+    {
+      "name": "doctor proxy accept appointment",
+      "method": "PUT",
+      "url": "http://localhost:3004/api/doctors/appointments/69e1d1b332fdf258f2d2a9f0/accept",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"message\":\"Appointment status updated to 'confirmed'.\",\"appointment\":{\"_id\":\"69e1d1b332fdf258f2d2a9f0\",\"patientId\":\"69e1d1b36d974764ab82fb23\",\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"date\":\"2026-04-18T00:00"
+    },
+    {
+      "name": "appointment status update direct",
+      "method": "PUT",
+      "url": "http://localhost:3002/api/appointments/69e1d1b332fdf258f2d2a9f0/status",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"message\":\"Appointment status updated to 'completed'.\",\"appointment\":{\"_id\":\"69e1d1b332fdf258f2d2a9f0\",\"patientId\":\"69e1d1b36d974764ab82fb23\",\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"date\":\"2026-04-18T00:00"
+    },
+    {
+      "name": "doctor proxy reject appointment",
+      "method": "PUT",
+      "url": "http://localhost:3004/api/doctors/appointments/69e1d1b332fdf258f2d2a9f2/reject",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"message\":\"Appointment cancelled successfully.\",\"appointment\":{\"_id\":\"69e1d1b332fdf258f2d2a9f2\",\"patientId\":\"69e1d1b36d974764ab82fb23\",\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"date\":\"2026-04-19T00:00:00.000"
+    },
+    {
+      "name": "appointment delete direct",
+      "method": "DELETE",
+      "url": "http://localhost:3002/api/appointments/69e1d1b332fdf258f2d2a9f4",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"message\":\"Appointment cancelled successfully.\",\"appointment\":{\"_id\":\"69e1d1b332fdf258f2d2a9f4\",\"patientId\":\"69e1d1b36d974764ab82fb23\",\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"date\":\"2026-04-20T00:00:00.000"
+    },
+    {
+      "name": "doctor proxy complete appointment",
+      "method": "PUT",
+      "url": "http://localhost:3004/api/doctors/appointments/69e1d1b332fdf258f2d2a9f6/complete",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"message\":\"Appointment status updated to 'completed'.\",\"appointment\":{\"_id\":\"69e1d1b332fdf258f2d2a9f6\",\"patientId\":\"69e1d1b36d974764ab82fb23\",\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"date\":\"2026-04-21T00:00"
+    },
+    {
+      "name": "payment create",
+      "method": "POST",
+      "url": "http://localhost:3003/api/payments/create",
+      "expected": "201",
+      "status": 201,
+      "pass": true,
+      "summary": "{\"success\":true,\"message\":\"Payment created successfully. Status: pending.\",\"data\":{\"patientId\":\"69e1d1b36d974764ab82fb23\",\"appointmentId\":\"69e1d1b332fdf258f2d2a9f6\",\"amount\":120.5,\"currency\":\"USD\",\"status\":\"pending\",\"pay"
+    },
+    {
+      "name": "payment get by id",
+      "method": "GET",
+      "url": "http://localhost:3003/api/payments/69e1d1b41b89c4955ddafb23",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"data\":{\"_id\":\"69e1d1b41b89c4955ddafb23\",\"patientId\":\"69e1d1b36d974764ab82fb23\",\"appointmentId\":\"69e1d1b332fdf258f2d2a9f6\",\"amount\":120.5,\"currency\":\"USD\",\"status\":\"pending\",\"paymentMethod\":\"credit_card\","
+    },
+    {
+      "name": "payment list by patient",
+      "method": "GET",
+      "url": "http://localhost:3003/api/payments/patient/69e1d1b36d974764ab82fb23",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"count\":1,\"data\":[{\"_id\":\"69e1d1b41b89c4955ddafb23\",\"patientId\":\"69e1d1b36d974764ab82fb23\",\"appointmentId\":\"69e1d1b332fdf258f2d2a9f6\",\"amount\":120.5,\"currency\":\"USD\",\"status\":\"pending\",\"paymentMethod\":\"cr"
+    },
+    {
+      "name": "payment list all (admin)",
+      "method": "GET",
+      "url": "http://localhost:3003/api/payments",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"count\":8,\"data\":[{\"_id\":\"69e1d1b41b89c4955ddafb23\",\"patientId\":\"69e1d1b36d974764ab82fb23\",\"appointmentId\":\"69e1d1b332fdf258f2d2a9f6\",\"amount\":120.5,\"currency\":\"USD\",\"status\":\"pending\",\"paymentMethod\":\"cr"
+    },
+    {
+      "name": "payment confirm (admin)",
+      "method": "POST",
+      "url": "http://localhost:3003/api/payments/confirm",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"message\":\"Payment confirmed successfully.\",\"data\":{\"_id\":\"69e1d1b41b89c4955ddafb23\",\"patientId\":\"69e1d1b36d974764ab82fb23\",\"appointmentId\":\"69e1d1b332fdf258f2d2a9f6\",\"amount\":120.5,\"currency\":\"USD\",\"stat"
+    },
+    {
+      "name": "payment create #2",
+      "method": "POST",
+      "url": "http://localhost:3003/api/payments/create",
+      "expected": "201",
+      "status": 201,
+      "pass": true,
+      "summary": "{\"success\":true,\"message\":\"Payment created successfully. Status: pending.\",\"data\":{\"patientId\":\"69e1d1b36d974764ab82fb23\",\"appointmentId\":\"69e1d1b332fdf258f2d2a9f8\",\"amount\":90,\"currency\":\"USD\",\"status\":\"pending\",\"paymen"
+    },
+    {
+      "name": "payment fail (admin)",
+      "method": "POST",
+      "url": "http://localhost:3003/api/payments/fail",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"message\":\"Payment marked as failed.\",\"data\":{\"_id\":\"69e1d1b41b89c4955ddafb2b\",\"patientId\":\"69e1d1b36d974764ab82fb23\",\"appointmentId\":\"69e1d1b332fdf258f2d2a9f8\",\"amount\":90,\"currency\":\"USD\",\"status\":\"fail"
+    },
+    {
+      "name": "payment initiate online",
+      "method": "POST",
+      "url": "http://localhost:3003/api/payments/initiate-online",
+      "expected": "201",
+      "status": 201,
+      "pass": true,
+      "summary": "{\"paymentId\":\"69e1d1b41b89c4955ddafb30\",\"redirectUrl\":\"https://checkout.stripe.com/c/pay/cs_test_a1EGwe6v3Ywssza8lVE5FwlIq5PonCU7jpuaOWo17PvXQJKAPF9z29zDOV#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdkdWxOYHwnPyd1blpxYHZxWjA0UU"
+    },
+    {
+      "name": "payment webhook payhere",
+      "method": "POST",
+      "url": "http://localhost:3003/api/payments/webhook/payhere",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"received\":true,\"provider\":\"PAYHERE\",\"paymentId\":\"69e1d1b41b89c4955ddafb30\",\"status\":\"completed\"}"
+    },
+    {
+      "name": "telemedicine create session",
+      "method": "POST",
+      "url": "http://localhost:3005/api/telemedicine/sessions",
+      "expected": "201/200",
+      "status": 201,
+      "pass": true,
+      "summary": "{\"success\":true,\"session\":{\"appointmentId\":\"69e1d1b332fdf258f2d2a9f6\",\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"patientId\":\"69e1d1b36d974764ab82fb23\",\"roomName\":\"medico-69e1d1b332fdf258f2d2a9f6-a201ba0e\",\"jitsiDomain\":\"meet"
+    },
+    {
+      "name": "telemedicine get session by id",
+      "method": "GET",
+      "url": "http://localhost:3005/api/telemedicine/sessions/69e1d1b5ed9979e8c47edf05",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"session\":{\"_id\":\"69e1d1b5ed9979e8c47edf05\",\"appointmentId\":\"69e1d1b332fdf258f2d2a9f6\",\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"patientId\":\"69e1d1b36d974764ab82fb23\",\"roomName\":\"medico-69e1d1b332fdf258f2d2a"
+    },
+    {
+      "name": "telemedicine get join info",
+      "method": "GET",
+      "url": "http://localhost:3005/api/telemedicine/sessions/69e1d1b5ed9979e8c47edf05/join-info",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"joinInfo\":{\"roomName\":\"medico-69e1d1b332fdf258f2d2a9f6-a201ba0e\",\"domain\":\"meet.jit.si\",\"meetingUrl\":\"https://meet.jit.si/medico-69e1d1b332fdf258f2d2a9f6-a201ba0e\",\"isModerator\":true,\"displayName\":\"Docto"
+    },
+    {
+      "name": "telemedicine start session",
+      "method": "PUT",
+      "url": "http://localhost:3005/api/telemedicine/sessions/69e1d1b5ed9979e8c47edf05/start",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"session\":{\"_id\":\"69e1d1b5ed9979e8c47edf05\",\"appointmentId\":\"69e1d1b332fdf258f2d2a9f6\",\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"patientId\":\"69e1d1b36d974764ab82fb23\",\"roomName\":\"medico-69e1d1b332fdf258f2d2a"
+    },
+    {
+      "name": "telemedicine end session",
+      "method": "PUT",
+      "url": "http://localhost:3005/api/telemedicine/sessions/69e1d1b5ed9979e8c47edf05/end",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"session\":{\"_id\":\"69e1d1b5ed9979e8c47edf05\",\"appointmentId\":\"69e1d1b332fdf258f2d2a9f6\",\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"patientId\":\"69e1d1b36d974764ab82fb23\",\"roomName\":\"medico-69e1d1b332fdf258f2d2a"
+    },
+    {
+      "name": "telemedicine get session by appointment",
+      "method": "GET",
+      "url": "http://localhost:3005/api/telemedicine/sessions/appointment/69e1d1b332fdf258f2d2a9f6",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"session\":{\"_id\":\"69e1d1b5ed9979e8c47edf05\",\"appointmentId\":\"69e1d1b332fdf258f2d2a9f6\",\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"patientId\":\"69e1d1b36d974764ab82fb23\",\"roomName\":\"medico-69e1d1b332fdf258f2d2a"
+    },
+    {
+      "name": "telemedicine mine (doctor)",
+      "method": "GET",
+      "url": "http://localhost:3005/api/telemedicine/sessions/mine",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"count\":1,\"sessions\":[{\"_id\":\"69e1d1b5ed9979e8c47edf05\",\"appointmentId\":\"69e1d1b332fdf258f2d2a9f6\",\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"patientId\":\"69e1d1b36d974764ab82fb23\",\"roomName\":\"medico-69e1d1b33"
+    },
+    {
+      "name": "telemedicine mine (patient)",
+      "method": "GET",
+      "url": "http://localhost:3005/api/telemedicine/sessions/mine",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"count\":1,\"sessions\":[{\"_id\":\"69e1d1b5ed9979e8c47edf05\",\"appointmentId\":\"69e1d1b332fdf258f2d2a9f6\",\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"patientId\":\"69e1d1b36d974764ab82fb23\",\"roomName\":\"medico-69e1d1b33"
+    },
+    {
+      "name": "doctor create prescription",
+      "method": "POST",
+      "url": "http://localhost:3004/api/doctors/prescriptions",
+      "expected": "201",
+      "status": 201,
+      "pass": true,
+      "summary": "{\"success\":true,\"prescription\":{\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"patientId\":\"69e1d1b36d974764ab82fb23\",\"appointmentId\":\"69e1d1b332fdf258f2d2a9f6\",\"doctorName\":\"Endpoint Test Doctor\",\"patientName\":\"Endpoint Test Pat"
+    },
+    {
+      "name": "doctor prescriptions mine",
+      "method": "GET",
+      "url": "http://localhost:3004/api/doctors/prescriptions/mine",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"count\":1,\"prescriptions\":[{\"_id\":\"69e1d1b50cc1142e2e71f630\",\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"patientId\":\"69e1d1b36d974764ab82fb23\",\"appointmentId\":\"69e1d1b332fdf258f2d2a9f6\",\"doctorName\":\"Endpoint "
+    },
+    {
+      "name": "doctor prescriptions by patient",
+      "method": "GET",
+      "url": "http://localhost:3004/api/doctors/prescriptions/patient/69e1d1b36d974764ab82fb23",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"count\":1,\"prescriptions\":[{\"_id\":\"69e1d1b50cc1142e2e71f630\",\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"patientId\":\"69e1d1b36d974764ab82fb23\",\"appointmentId\":\"69e1d1b332fdf258f2d2a9f6\",\"doctorName\":\"Endpoint "
+    },
+    {
+      "name": "doctor prescription by id",
+      "method": "GET",
+      "url": "http://localhost:3004/api/doctors/prescriptions/69e1d1b50cc1142e2e71f630",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"prescription\":{\"_id\":\"69e1d1b50cc1142e2e71f630\",\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"patientId\":\"69e1d1b36d974764ab82fb23\",\"appointmentId\":\"69e1d1b332fdf258f2d2a9f6\",\"doctorName\":\"Endpoint Test Doctor\""
+    },
+    {
+      "name": "patient history",
+      "method": "GET",
+      "url": "http://localhost:3001/api/patients/history",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"count\":6,\"appointments\":[{\"_id\":\"69e1d1b332fdf258f2d2a9f0\",\"patientId\":\"69e1d1b36d974764ab82fb23\",\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"date\":\"2026-04-18T00:00:00.000Z\",\"time\":\"10:45\",\"reason\":\"Reschedu"
+    },
+    {
+      "name": "patient prescriptions",
+      "method": "GET",
+      "url": "http://localhost:3001/api/patients/prescriptions",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"count\":1,\"prescriptions\":[{\"_id\":\"69e1d1b50cc1142e2e71f630\",\"doctorId\":\"69e1d1b20cc1142e2e71f60c\",\"patientId\":\"69e1d1b36d974764ab82fb23\",\"appointmentId\":\"69e1d1b332fdf258f2d2a9f6\",\"doctorName\":\"Endpoint "
+    },
+    {
+      "name": "patient upload report",
+      "method": "POST",
+      "url": "http://localhost:3001/api/patients/reports",
+      "expected": "201",
+      "status": 201,
+      "pass": true,
+      "summary": "{\"success\":true,\"message\":\"Report uploaded successfully.\",\"report\":{\"patientId\":\"69e1d1b36d974764ab82fb23\",\"fileUrl\":\"https://res.cloudinary.com/dus7bhnd3/image/upload/v1776406967/healthcare-app/patient_reports/report_17"
+    },
+    {
+      "name": "patient list reports",
+      "method": "GET",
+      "url": "http://localhost:3001/api/patients/reports",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"count\":1,\"reports\":[{\"_id\":\"69e1d1b76d974764ab82fb3c\",\"patientId\":\"69e1d1b36d974764ab82fb23\",\"fileUrl\":\"https://res.cloudinary.com/dus7bhnd3/image/upload/v1776406967/healthcare-app/patient_reports/report"
+    },
+    {
+      "name": "patient get report",
+      "method": "GET",
+      "url": "http://localhost:3001/api/patients/reports/69e1d1b76d974764ab82fb3c",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"report\":{\"_id\":\"69e1d1b76d974764ab82fb3c\",\"patientId\":\"69e1d1b36d974764ab82fb23\",\"fileUrl\":\"https://res.cloudinary.com/dus7bhnd3/image/upload/v1776406967/healthcare-app/patient_reports/report_17764069655"
+    },
+    {
+      "name": "patient delete report",
+      "method": "DELETE",
+      "url": "http://localhost:3001/api/patients/reports/69e1d1b76d974764ab82fb3c",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"message\":\"Report deleted successfully.\"}"
+    },
+    {
+      "name": "notification send",
+      "method": "POST",
+      "url": "http://localhost:5005/api/notifications/send",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"message\":\"Notification request accepted. Processing in background.\"}"
+    },
+    {
+      "name": "notification logs",
+      "method": "GET",
+      "url": "http://localhost:5005/api/notifications/logs",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"count\":100,\"logs\":[{\"_id\":\"69e1d1b8c469b3560ba7e008\",\"eventType\":\"APPOINTMENT_BOOKED\",\"recipient\":\"+94770009999\",\"channel\":\"whatsapp\",\"status\":\"failed\",\"errorMessage\":\"Account ACb2a0b668a9ba41f1e3a7dcd74"
+    },
+    {
+      "name": "doctor delete me",
+      "method": "DELETE",
+      "url": "http://localhost:3004/api/doctors/me",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"message\":\"Account deleted.\"}"
+    },
+    {
+      "name": "patient delete me",
+      "method": "DELETE",
+      "url": "http://localhost:3001/api/patients/me",
+      "expected": "200",
+      "status": 200,
+      "pass": true,
+      "summary": "{\"success\":true,\"message\":\"Account and all associated data deleted successfully.\"}"
+    }
+  ]
+}
